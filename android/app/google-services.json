@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "29193499588",
+    "project_id": "yesil-piyasa-e1ab4",
+    "storage_bucket": "yesil-piyasa-e1ab4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:29193499588:android:177ba7f5308b86026f6a91",
+        "android_client_info": {
+          "package_name": "com.example.yesil_piyasa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8dR5Ub1w75WK12XD9rkhoyinXBPTHgFU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
