@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yesil_piyasa/viewmodel/user_model.dart';
+import 'package:yesil_piyasa/views/auth/welcome_view.dart';
+import 'package:yesil_piyasa/views/circular_view.dart';
 import 'package:yesil_piyasa/views/home_view.dart';
-import 'package:yesil_piyasa/views/welcome_view.dart';
 
 class LandingView extends StatelessWidget {
   const LandingView({super.key});
@@ -11,18 +12,14 @@ class LandingView extends StatelessWidget {
   Widget build(BuildContext context) {
     final userModel = Provider.of<UserModel>(context);
 
-    if (userModel.state == ViewState.Idle) {
-      if (userModel.user == null) {
-        return const WelcomeView();
-      } else {
-        return HomeView(user: userModel.user);
-      }
-    } else {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
+    return Stack(
+      children: [
+        if (userModel.state == ViewState.Idle)
+          userModel.user == null
+              ? const WelcomeView()
+              : HomeView(user: userModel.user),
+        if (userModel.state != ViewState.Idle) const CircularView(),
+      ],
+    );
   }
 }

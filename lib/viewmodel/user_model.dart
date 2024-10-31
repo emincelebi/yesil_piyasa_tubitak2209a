@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yesil_piyasa/core/components/validate_check.dart';
 import 'package:yesil_piyasa/locator.dart';
 import 'package:yesil_piyasa/model/my_user.dart';
 import 'package:yesil_piyasa/repository/user_repository.dart';
@@ -31,7 +32,7 @@ class UserModel with ChangeNotifier implements AuthBase {
       _user = await _userRepository.currentUser();
       return _user;
     } catch (e) {
-      debugPrint('ViewModel current error $e');
+      debugPrint('Error in currentUser: $e');
       return null;
     } finally {
       state = ViewState.Idle;
@@ -45,7 +46,7 @@ class UserModel with ChangeNotifier implements AuthBase {
       _user = await _userRepository.signInAnonymously();
       return _user;
     } catch (e) {
-      debugPrint('ViewModel signInAnonymous error $e');
+      debugPrint('Error in anonymous sign-in: $e');
       return null;
     } finally {
       state = ViewState.Idle;
@@ -60,10 +61,60 @@ class UserModel with ChangeNotifier implements AuthBase {
       _user = null;
       return result;
     } catch (e) {
-      debugPrint('ViewModel SignOut error $e');
+      debugPrint('Error in sign-out: $e');
       return false;
     } finally {
       state = ViewState.Idle;
     }
+  }
+
+  @override
+  Future<MyUser?> createUserWithEmailAndPassword(
+      String email, String password) async {
+    try {
+      if (checkEmailAndPassword(email, password)) {
+        state = ViewState.Busy;
+        _user = await _userRepository.createUserWithEmailAndPassword(
+            email, password);
+        return _user;
+      }
+      return null;
+    } finally {
+      state = ViewState.Idle;
+    }
+  }
+
+  @override
+  Future<MyUser?> signInWithEmailAndPassword(
+      String email, String password) async {
+    try {
+      if (checkEmailAndPassword(email, password)) {
+        state = ViewState.Busy;
+        _user =
+            await _userRepository.signInWithEmailAndPassword(email, password);
+        return _user;
+      }
+      return null;
+    } catch (e) {
+      debugPrint('ViewModel signInFacebook error $e');
+      return null;
+    } finally {
+      state = ViewState.Idle;
+    }
+  }
+
+  bool checkEmailAndPassword(String email, String password) {
+    var result = true;
+    if (!(ValidateCheck().validatePasswordBool(password))) {
+      result = false;
+    } else {
+      result = true;
+    }
+    if (!(ValidateCheck().validateEmailBool(email))) {
+      result = false;
+    } else {
+      result = true;
+    }
+    return result;
   }
 }

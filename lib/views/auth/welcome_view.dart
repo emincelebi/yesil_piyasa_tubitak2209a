@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yesil_piyasa/core/components/validate_check.dart';
 import 'package:yesil_piyasa/core/widgets/welcome_button.dart';
 import 'package:yesil_piyasa/core/widgets/welcome_textfield.dart';
 import 'package:yesil_piyasa/model/my_user.dart';
@@ -21,6 +22,10 @@ class _WelcomeViewState extends State<WelcomeView>
   final _formKeyLogin = GlobalKey<FormState>();
   final _formKeySignup = GlobalKey<FormState>();
 
+  // Define the controllers for email and password fields
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -30,14 +35,74 @@ class _WelcomeViewState extends State<WelcomeView>
   @override
   void dispose() {
     _tabController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
+
+  // Use these getters to retrieve the values
+  String get email => _emailController.text;
+  String get password => _passwordController.text;
 
   Future<void> _anonymousLogin() async {
     final userModel = Provider.of<UserModel>(context, listen: false);
     MyUser? user = await userModel.signInAnonymously();
     if (kDebugMode) {
       print('Oturum acan user: ${user!.userID}');
+    }
+  }
+
+  signUpEmailAndPassword(String email, String password) async {
+    final userModel = Provider.of<UserModel>(context, listen: false);
+    try {
+      if (_formKeyLogin.currentState != null)
+        _formKeyLogin.currentState!.save();
+      MyUser? user =
+          await userModel.createUserWithEmailAndPassword(email, password);
+      if (user != null && mounted) {
+        debugPrint("$email $password");
+        setState(() {});
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('User creation error'),
+              content: const Text('This user is already used'),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Exit'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+  }
+
+  signInEmailAndPassword(String email, String password) async {
+    final userModel = Provider.of<UserModel>(context, listen: false);
+    try {
+      if (_formKeySignup.currentState != null)
+        _formKeySignup.currentState!.save();
+      MyUser? user =
+          await userModel.signInWithEmailAndPassword(email, password);
+      if (user != null && mounted) {
+        debugPrint("$email $password");
+        setState(() {});
+      }
+    } catch (e) {
+      if (mounted) {
+        if (kDebugMode) {
+          print('Widget hata $e');
+        }
+      }
     }
   }
 
@@ -124,6 +189,7 @@ class _WelcomeViewState extends State<WelcomeView>
               hintText: 'E-posta Adresiniz...',
               icon: Icons.email,
               keyboardType: TextInputType.emailAddress,
+              controller: _emailController,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Lütfen e-posta adresinizi girin';
@@ -136,6 +202,7 @@ class _WelcomeViewState extends State<WelcomeView>
               hintText: 'Şifreniz...',
               icon: Icons.lock,
               obscureText: true,
+              controller: _passwordController,
               validator: (value) {
                 if (value == null || value.length < 6) {
                   return 'Şifreniz en az 6 karakter olmalıdır';
@@ -148,7 +215,7 @@ class _WelcomeViewState extends State<WelcomeView>
               text: 'Giriş Yap',
               onPressed: () {
                 if (_formKeyLogin.currentState?.validate() ?? false) {
-                  // Giriş işlemi
+                  signInEmailAndPassword(email, password);
                 }
               },
             ),
@@ -203,24 +270,16 @@ class _WelcomeViewState extends State<WelcomeView>
                 hintText: 'E-posta Adresiniz...',
                 icon: Icons.email,
                 keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Lütfen e-posta adresinizi girin';
-                  }
-                  return null;
-                },
+                controller: _emailController,
+                validator: ValidateCheck().validateEmail,
               ),
               const SizedBox(height: 10),
               WelcomeTextField(
                 hintText: 'Şifreniz...',
                 icon: Icons.lock,
                 obscureText: true,
-                validator: (value) {
-                  if (value == null || value.length < 6) {
-                    return 'Şifreniz en az 6 karakter olmalıdır';
-                  }
-                  return null;
-                },
+                controller: _passwordController,
+                validator: ValidateCheck().validatePassword,
               ),
               const SizedBox(height: 10),
               WelcomeTextField(
@@ -239,6 +298,7 @@ class _WelcomeViewState extends State<WelcomeView>
                 onPressed: () {
                   if (_formKeySignup.currentState?.validate() ?? false) {
                     // Kayıt işlemi
+                    signUpEmailAndPassword(email, password);
                   }
                 },
               ),
