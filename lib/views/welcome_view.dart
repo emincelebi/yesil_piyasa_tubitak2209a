@@ -1,14 +1,15 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:yesil_piyasa/core/widgets/welcome_button.dart';
 import 'package:yesil_piyasa/core/widgets/welcome_textfield.dart';
+import 'package:yesil_piyasa/model/my_user.dart';
+import 'package:yesil_piyasa/viewmodel/user_model.dart';
 
 enum LoginState { initialize, login, signup }
 
 class WelcomeView extends StatefulWidget {
-  const WelcomeView({super.key, required this.onSignIn});
-  final Function(User) onSignIn;
+  const WelcomeView({super.key});
 
   @override
   State<WelcomeView> createState() => _WelcomeViewState();
@@ -33,10 +34,10 @@ class _WelcomeViewState extends State<WelcomeView>
   }
 
   Future<void> _anonymousLogin() async {
-    UserCredential result = await FirebaseAuth.instance.signInAnonymously();
-    widget.onSignIn(result.user!);
+    final userModel = Provider.of<UserModel>(context, listen: false);
+    MyUser? user = await userModel.signInAnonymously();
     if (kDebugMode) {
-      print('Oturum acan user: ${result.user!.uid}');
+      print('Oturum acan user: ${user!.userID}');
     }
   }
 
