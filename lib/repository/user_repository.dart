@@ -15,28 +15,48 @@ class UserRepository implements AuthBase {
 
   @override
   Future<MyUser?> currentUser() async {
-    if (appMode == AppMode.DEBUG) {
-      return await _fakeAuthService.currentUser();
-    } else {
-      return await _firebaseAuthService.currentUser();
-    }
+    return appMode == AppMode.DEBUG
+        ? await _fakeAuthService.currentUser()
+        : await _firebaseAuthService.currentUser();
   }
 
   @override
   Future<MyUser?> signInAnonymously() async {
-    if (appMode == AppMode.DEBUG) {
-      return await _fakeAuthService.signInAnonymously();
-    } else {
-      return await _firebaseAuthService.signInAnonymously();
-    }
+    return appMode == AppMode.DEBUG
+        ? await _fakeAuthService.signInAnonymously()
+        : await _firebaseAuthService.signInAnonymously();
   }
 
   @override
   Future<bool> signOut() async {
+    return appMode == AppMode.DEBUG
+        ? await _fakeAuthService.signOut()
+        : await _firebaseAuthService.signOut();
+  }
+
+  @override
+  Future<MyUser?> createUserWithEmailAndPassword(
+      String email, String password) async {
     if (appMode == AppMode.DEBUG) {
-      return await _fakeAuthService.signOut();
+      return await _fakeAuthService.createUserWithEmailAndPassword(
+          email, password);
     } else {
-      return await _firebaseAuthService.signOut();
+      MyUser? user = await _firebaseAuthService.createUserWithEmailAndPassword(
+          email, password);
+      return user;
     }
+  }
+
+  @override
+  Future<MyUser?> signInWithEmailAndPassword(
+      String email, String password) async {
+    if (appMode == AppMode.DEBUG) {
+      return await _fakeAuthService.signInWithEmailAndPassword(email, password);
+    } else {
+      MyUser? myUser = await _firebaseAuthService.signInWithEmailAndPassword(
+          email, password);
+      if (myUser != null) return myUser;
+    }
+    return null;
   }
 }

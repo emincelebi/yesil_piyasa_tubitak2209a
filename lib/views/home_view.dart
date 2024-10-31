@@ -31,7 +31,7 @@ class HomeView extends StatelessWidget {
         centerTitle: true,
       ),
       body: Center(
-        child: Text('Yeşil Piyasaya Hoşgeldiniz ${userModel.user!.userID}'),
+        child: Text('Yeşil Piyasaya Hoşgeldiniz ${userModel.user!.email}'),
       ),
     );
   }
