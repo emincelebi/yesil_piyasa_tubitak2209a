@@ -4,6 +4,7 @@ abstract class AuthBase {
   Future<MyUser?> currentUser();
   Future<MyUser?> signInAnonymously();
   Future<bool> signOut();
-  Future<MyUser?> createUserWithEmailAndPassword(String email, String password);
+  Future<MyUser?> createUserWithEmailAndPassword(
+      String email, String password, MyUser myUser);
   Future<MyUser?> signInWithEmailAndPassword(String email, String password);
 }

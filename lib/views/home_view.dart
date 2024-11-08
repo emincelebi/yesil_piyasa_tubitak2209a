@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yesil_piyasa/model/my_user.dart';
+import 'package:yesil_piyasa/services/firestore_db_service.dart';
 import 'package:yesil_piyasa/viewmodel/user_model.dart';
 
 // ignore: must_be_immutable
 class HomeView extends StatelessWidget {
-  const HomeView({super.key, required this.user});
+  HomeView({super.key, required this.user});
 
   final MyUser? user;
+
+  MyUser? myUser;
+
+  final FireStoreDBService fireStoreDBService = FireStoreDBService();
 
   Future<bool> _signOut(BuildContext context) async {
     final userModel = Provider.of<UserModel>(context, listen: false);
@@ -18,6 +23,7 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userModel = Provider.of<UserModel>(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Ana Sayfa'),
