@@ -70,12 +70,12 @@ class UserModel with ChangeNotifier implements AuthBase {
 
   @override
   Future<MyUser?> createUserWithEmailAndPassword(
-      String email, String password) async {
+      String email, String password, MyUser myUser) async {
     try {
       if (checkEmailAndPassword(email, password)) {
         state = ViewState.Busy;
         _user = await _userRepository.createUserWithEmailAndPassword(
-            email, password);
+            email, password, myUser);
         return _user;
       }
       return null;
@@ -96,7 +96,7 @@ class UserModel with ChangeNotifier implements AuthBase {
       }
       return null;
     } catch (e) {
-      debugPrint('ViewModel signInFacebook error $e');
+      debugPrint('ViewModel signIn error $e');
       return null;
     } finally {
       state = ViewState.Idle;
