@@ -12,7 +12,10 @@ class _ProductsViewState extends State<ProductsView> {
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(
-        child: Text('Home Page'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [Icon(Icons.home, size: 100), Text('ANA SAYFA')],
+        ),
       ),
     );
   }

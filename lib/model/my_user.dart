@@ -58,7 +58,8 @@ class MyUser {
       'location': location,
       'products': products ?? [],
       'about': about ?? 'Çiftçiyim',
-      'profileImageUrl': profileImageUrl ?? 'https://i.sstatic.net/l60Hf.png',
+      'profileImageUrl': profileImageUrl ??
+          'https://static.vecteezy.com/system/resources/previews/020/911/740/non_2x/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png',
       'createdAt': createdAt ?? FieldValue.serverTimestamp(),
       'updatedAt': updatedAt ?? FieldValue.serverTimestamp(),
     };

@@ -12,7 +12,10 @@ class _AddProductsViewState extends State<AddProductsView> {
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(
-        child: Text('add products'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [Icon(Icons.add_circle, size: 100), Text('ÜRÜN EKLE')],
+        ),
       ),
     );
   }
