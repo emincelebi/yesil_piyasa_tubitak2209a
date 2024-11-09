@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="yesil_piyasa"
+        android:label="Yeşil Piyasa"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
