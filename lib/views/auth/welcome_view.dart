@@ -110,11 +110,12 @@ class _WelcomeViewState extends State<WelcomeView>
               ),
               Column(
                 children: [
+                  const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 20.0),
                     child: Image.asset(
                       'assets/images/logo.png',
-                      height: 100,
+                      height: 170,
                     ),
                   ),
                   TabBar(
