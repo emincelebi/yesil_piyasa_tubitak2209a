@@ -5,6 +5,7 @@ import 'package:yesil_piyasa/locator.dart';
 import 'package:yesil_piyasa/viewmodel/user_model.dart';
 import 'package:yesil_piyasa/views/landing_view.dart';
 
+GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey();
 void main() async {
   setupLocator();
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => UserModel(),
       child: MaterialApp(
+        navigatorKey: rootNavigatorKey,
         title: 'Yeşil Piyasa',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(

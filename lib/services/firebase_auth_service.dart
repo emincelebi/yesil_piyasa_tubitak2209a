@@ -1,6 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:yesil_piyasa/model/my_user.dart';
 import 'package:yesil_piyasa/services/auth_base.dart';
 
@@ -9,15 +7,8 @@ class FirebaseAuthService implements AuthBase {
 
   @override
   Future<MyUser?> currentUser() async {
-    try {
-      User? user = _firebaseAuth.currentUser;
-      return _myUserFromFirebase(user);
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error in currentUser: $e');
-      }
-    }
-    return null;
+    User? user = _firebaseAuth.currentUser;
+    return _myUserFromFirebase(user);
   }
 
   MyUser? _myUserFromFirebase(User? user) {
@@ -29,57 +20,29 @@ class FirebaseAuthService implements AuthBase {
 
   @override
   Future<MyUser?> signInAnonymously() async {
-    try {
-      UserCredential result = await _firebaseAuth.signInAnonymously();
-      return _myUserFromFirebase(result.user);
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error in anonymous sign-in: $e');
-      }
-      return null;
-    }
+    UserCredential result = await _firebaseAuth.signInAnonymously();
+    return _myUserFromFirebase(result.user);
   }
 
   @override
   Future<bool> signOut() async {
-    try {
-      await _firebaseAuth.signOut();
-      return true;
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error in sign-out: $e');
-      }
-      return false;
-    }
+    await _firebaseAuth.signOut();
+    return true;
   }
 
   @override
   Future<MyUser?> createUserWithEmailAndPassword(
       String email, String password, MyUser myUser) async {
-    try {
-      UserCredential result = await _firebaseAuth
-          .createUserWithEmailAndPassword(email: email, password: password);
-      return _myUserFromFirebase(result.user);
-    } on PlatformException catch (e) {
-      if (kDebugMode) {
-        print('Firebase create error: ${e.code}');
-      }
-      return null;
-    }
+    UserCredential result = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email, password: password);
+    return _myUserFromFirebase(result.user);
   }
 
   @override
   Future<MyUser?> signInWithEmailAndPassword(
       String email, String password) async {
-    try {
-      UserCredential result = await _firebaseAuth.signInWithEmailAndPassword(
-          email: email, password: password);
-      return _myUserFromFirebase(result.user);
-    } catch (e) {
-      if (kDebugMode) {
-        print('Firebase login error: $e');
-      }
-      return null;
-    }
+    UserCredential result = await _firebaseAuth.signInWithEmailAndPassword(
+        email: email, password: password);
+    return _myUserFromFirebase(result.user);
   }
 }
