@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yesil_piyasa/core/components/validate_check.dart';
+import 'package:yesil_piyasa/core/widgets/error_display.dart';
 import 'package:yesil_piyasa/core/widgets/welcome_button.dart';
 import 'package:yesil_piyasa/core/widgets/welcome_textfield.dart';
+import 'package:yesil_piyasa/main.dart';
 import 'package:yesil_piyasa/model/my_user.dart';
 import 'package:yesil_piyasa/viewmodel/user_model.dart';
 
@@ -67,26 +70,8 @@ class _WelcomeViewState extends State<WelcomeView>
         debugPrint("$email $password");
         setState(() {});
       }
-    } catch (e) {
-      if (mounted) {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text('User creation error'),
-              content: const Text('This user is already used'),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Exit'),
-                ),
-              ],
-            );
-          },
-        );
-      }
+    } on FirebaseAuthException catch (e) {
+      showError(e.code);
     }
   }
 
@@ -101,11 +86,14 @@ class _WelcomeViewState extends State<WelcomeView>
         debugPrint("$email $password");
         setState(() {});
       }
-    } catch (e) {
-      if (mounted) {
-        debugPrint('Widget hata $e');
-      }
+    } on FirebaseAuthException catch (e) {
+      showError(e.code);
     }
+  }
+
+  void showError(String englishCode) {
+    BuildContext? context = rootNavigatorKey.currentState?.context;
+    ErrorDisplay.showTopError(context!, englishCode);
   }
 
   @override

@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:yesil_piyasa/viewmodel/user_model.dart';
 import 'package:yesil_piyasa/views/auth/welcome_view.dart';
 import 'package:yesil_piyasa/views/circular_view.dart';
-import 'package:yesil_piyasa/views/home_view.dart';
+import 'package:yesil_piyasa/views/home/home_view.dart';
 
 class LandingView extends StatelessWidget {
   const LandingView({super.key});

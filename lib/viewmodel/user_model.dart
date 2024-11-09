@@ -27,80 +27,59 @@ class UserModel with ChangeNotifier implements AuthBase {
 
   @override
   Future<MyUser?> currentUser() async {
-    try {
-      state = ViewState.Busy;
-      _user = await _userRepository.currentUser();
-      return _user;
-    } catch (e) {
-      debugPrint('Error in currentUser: $e');
-      return null;
-    } finally {
-      state = ViewState.Idle;
-    }
+    state = ViewState.Busy;
+    _user = await _userRepository.currentUser();
+    state = ViewState.Idle;
+    return _user;
   }
 
   @override
   Future<MyUser?> signInAnonymously() async {
-    try {
-      state = ViewState.Busy;
-      _user = await _userRepository.signInAnonymously();
-      return _user;
-    } catch (e) {
-      debugPrint('Error in anonymous sign-in: $e');
-      return null;
-    } finally {
-      state = ViewState.Idle;
-    }
+    state = ViewState.Busy;
+    _user = await _userRepository.signInAnonymously();
+    state = ViewState.Idle;
+    return _user;
   }
 
   @override
   Future<bool> signOut() async {
-    try {
-      state = ViewState.Busy;
-      bool result = await _userRepository.signOut();
-      _user = null;
-      return result;
-    } catch (e) {
-      debugPrint('Error in sign-out: $e');
-      return false;
-    } finally {
-      state = ViewState.Idle;
-    }
+    state = ViewState.Busy;
+    bool result = await _userRepository.signOut();
+    _user = null;
+    state = ViewState.Idle;
+    return result;
   }
 
   @override
   Future<MyUser?> createUserWithEmailAndPassword(
       String email, String password, MyUser myUser) async {
-    try {
-      if (checkEmailAndPassword(email, password)) {
+    if (checkEmailAndPassword(email, password)) {
+      try {
         state = ViewState.Busy;
         _user = await _userRepository.createUserWithEmailAndPassword(
             email, password, myUser);
         return _user;
+      } finally {
+        state = ViewState.Idle;
       }
-      return null;
-    } finally {
-      state = ViewState.Idle;
     }
+    return null;
   }
 
   @override
   Future<MyUser?> signInWithEmailAndPassword(
       String email, String password) async {
-    try {
-      if (checkEmailAndPassword(email, password)) {
+    if (checkEmailAndPassword(email, password)) {
+      try {
         state = ViewState.Busy;
         _user =
             await _userRepository.signInWithEmailAndPassword(email, password);
         return _user;
+      } finally {
+        state = ViewState.Idle;
       }
-      return null;
-    } catch (e) {
-      debugPrint('ViewModel signIn error $e');
-      return null;
-    } finally {
-      state = ViewState.Idle;
     }
+    return null;
   }
 
   bool checkEmailAndPassword(String email, String password) {
