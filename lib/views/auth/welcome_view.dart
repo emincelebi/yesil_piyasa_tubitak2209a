@@ -53,12 +53,6 @@ class _WelcomeViewState extends State<WelcomeView>
   String get email => _emailController.text;
   String get password => _passwordController.text;
 
-  Future<void> _anonymousLogin() async {
-    final userModel = Provider.of<UserModel>(context, listen: false);
-    MyUser? user = await userModel.signInAnonymously();
-    debugPrint('Oturum acan user: ${user!.userID}');
-  }
-
   signUpEmailAndPassword(String email, String password, MyUser myUser) async {
     final userModel = Provider.of<UserModel>(context, listen: false);
     try {
@@ -154,10 +148,6 @@ class _WelcomeViewState extends State<WelcomeView>
                     ),
                   ),
                   const SizedBox(height: 10),
-                  WelcomeButton(
-                    text: 'Misafir Girişi',
-                    onPressed: _anonymousLogin,
-                  ),
                 ],
               ),
             ],

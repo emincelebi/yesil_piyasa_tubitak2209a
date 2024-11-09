@@ -32,12 +32,6 @@ class _HomeViewState extends State<HomeView> {
     const AddProductsView(),
   ];
 
-  final List<String> _titles = [
-    'Ürünlerim',
-    'Ana Sayfa',
-    'Ürün Ekle',
-  ];
-
   Future<bool> signOut(BuildContext context) async {
     final userModel = Provider.of<UserModel>(context, listen: false);
     return await userModel.signOut();

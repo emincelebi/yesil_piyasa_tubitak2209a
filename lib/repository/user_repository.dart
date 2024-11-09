@@ -17,9 +17,15 @@ class UserRepository implements AuthBase {
 
   @override
   Future<MyUser?> currentUser() async {
-    return appMode == AppMode.DEBUG
-        ? await _fakeAuthService.currentUser()
-        : await _firebaseAuthService.currentUser();
+    if (appMode == AppMode.DEBUG) {
+      return await _fakeAuthService.currentUser();
+    } else {
+      MyUser? user = await _firebaseAuthService.currentUser();
+      if (user != null) {
+        return await _fireStoreDbService.readUser(user.userID);
+      }
+    }
+    return null;
   }
 
   @override
