@@ -178,7 +178,7 @@ class _HomeViewState extends State<HomeView> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ReportView()),
+                    MaterialPageRoute(builder: (context) => ReportView()),
                   );
                 },
               ),
