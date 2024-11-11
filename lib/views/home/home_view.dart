@@ -1,4 +1,9 @@
+import 'dart:math';
+
+import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:yesil_piyasa/model/my_user.dart';
@@ -22,7 +27,7 @@ class HomeView extends StatefulWidget {
   State<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   int _currentIndex = 1;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -32,222 +37,300 @@ class _HomeViewState extends State<HomeView> {
     const AddProductsView(),
   ];
 
-  Future<bool> signOut(BuildContext context) async {
-    final userModel = Provider.of<UserModel>(context, listen: false);
-    return await userModel.signOut();
+  final List<Color> _backgroundColors = [
+    const Color.fromARGB(255, 0, 254, 73), // Yeşil
+    const Color.fromARGB(255, 2, 171, 250), // Mavi
+    const Color.fromARGB(255, 249, 159, 2), // Turuncu
+  ];
+
+  final List<Color> _titleColors = [
+    Colors.white,
+    Colors.black,
+    Colors.redAccent,
+    Colors.deepPurple,
+    Colors.deepOrangeAccent,
+    Colors.pinkAccent,
+    Colors.purpleAccent,
+    Colors.orangeAccent,
+    Colors.indigoAccent,
+    Colors.lightGreenAccent,
+    Colors.brown,
+    Colors.grey,
+    Colors.blueGrey,
+    Colors.yellow,
+    Colors.red,
+    Colors.purple,
+    Colors.orange,
+    Colors.pink,
+    Colors.green,
+    Colors.amberAccent,
+    Colors.deepPurpleAccent,
+    Colors.black87,
+  ];
+
+  Color _titleColor = Colors.white;
+  late AnimationController _rotationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _rotationController = AnimationController(
+      duration: const Duration(milliseconds: 700),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _rotationController.dispose();
+    super.dispose();
+  }
+
+  // Rastgele başlık rengi seçimi
+  void _changeTitleColor() {
+    final random = Random();
+    setState(() {
+      _titleColor = _titleColors[random.nextInt(_titleColors.length)];
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.green, Colors.lightGreen],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+      appBar: _buildAnimatedAppBar(),
+      drawer: _buildAnimatedDrawer(),
+      body: Container(
+        color: _backgroundColors[_currentIndex],
+        child: PageTransitionSwitcher(
+          duration: const Duration(milliseconds: 700),
+          reverse: _currentIndex != 1,
+          transitionBuilder: (child, animation, secondaryAnimation) =>
+              FadeTransition(
+            opacity: animation,
+            child: ScaleTransition(scale: animation, child: child),
           ),
-        ),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () {
-                scaffoldKey.currentState!.openDrawer();
-              },
-            ),
-            Text(
-              'Yeşil Piyasa',
-              style: GoogleFonts.pacifico(
-                textStyle: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.search),
-              onPressed: () {
-                print('Arama tıklandı!');
-              },
-            ),
-          ],
-        ),
-        centerTitle: true,
-      ),
-      drawer: Drawer(
-        child: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.green, Colors.lightGreen],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              DrawerHeader(
-                decoration: const BoxDecoration(
-                  color: Colors.transparent,
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      alignment: Alignment.center,
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        height: 120,
-                        width: 120,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.person, color: Colors.white),
-                title:
-                    const Text('Profil', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ProfileView()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.home, color: Colors.white),
-                title: const Text('Ana Sayfa',
-                    style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    _currentIndex = 1;
-                  });
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.list, color: Colors.white),
-                title: const Text('Ürünlerim',
-                    style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    _currentIndex = 0;
-                  });
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.add_circle, color: Colors.white),
-                title: const Text('Ürün Ekle',
-                    style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    _currentIndex = 2;
-                  });
-                },
-              ),
-              const Divider(
-                color: Colors.white70,
-                thickness: 1,
-              ),
-              ListTile(
-                leading: const Icon(Icons.info, color: Colors.white),
-                title: const Text('Hakkımızda',
-                    style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const AboutView()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.report, color: Colors.white),
-                title: const Text('Şikayet Et',
-                    style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ReportView()),
-                  );
-                },
-              ),
-              const Divider(
-                color: Colors.white70,
-                thickness: 1,
-              ),
-              ListTile(
-                leading: const Icon(Icons.logout, color: Colors.red),
-                title: const Text('Çıkış Yap',
-                    style: TextStyle(color: Colors.red)),
-                onTap: () {
-                  signOut(context);
-                },
-              ),
-            ],
-          ),
+          child: _pages[_currentIndex],
         ),
       ),
-      body: _pages[_currentIndex],
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.green,
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8.0,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildBottomBarItem(Icons.list, 'Ürünlerim', 0),
-            const SizedBox(width: 56),
-            _buildBottomBarItem(Icons.add_circle, 'Ürün Ekle', 2),
-          ],
-        ),
-      ),
+      bottomNavigationBar: _buildBottomNavigationBar(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: _buildFloatingActionButton(),
+    );
+  }
+
+  // Animasyonlu AppBar
+  PreferredSizeWidget _buildAnimatedAppBar() {
+    return AppBar(
+      backgroundColor: _backgroundColors[_currentIndex],
+      leading: IconButton(
+        icon: const Icon(Icons.menu),
+        onPressed: () => scaffoldKey.currentState?.openDrawer(),
+      )
+          .animate(
+            onPlay: (controller) => controller.repeat(reverse: true),
+          )
+          .scaleXY(end: 1.1, curve: Curves.easeInOut),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.search),
+          onPressed: () {
+            // Arama butonuna basıldığında yapılacak işlem (boş fonksiyon)
+          },
+        )
+            .animate(
+              onPlay: (controller) => controller.repeat(reverse: true),
+            )
+            .scaleXY(end: 1.1, curve: Curves.easeInOut),
+      ],
+      flexibleSpace: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [_backgroundColors[_currentIndex], Colors.green],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+      ),
+      title: Animate(
+        effects: const [
+          SlideEffect(
+            duration: Duration(milliseconds: 700),
+            begin: Offset(-0.5, 0),
+            curve: Curves.easeOut,
+          ),
+          FadeEffect(duration: Duration(milliseconds: 500))
+        ],
+        child: Text(
+          'Yeşil Piyasa',
+          style: GoogleFonts.pacifico(
+            textStyle: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: _titleColor, // Rastgele renk buradan uygulanacak
+            ),
+          ),
+        ),
+      ),
+      centerTitle: true,
+      elevation: 12,
+      shadowColor: Colors.black38,
+    );
+  }
+
+  // Animasyonlu Drawer
+  Widget _buildAnimatedDrawer() {
+    return Drawer(
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.teal, Colors.blueAccent],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/doga.jpg'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: Center(
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  height: 120,
+                  width: 120,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            _buildDrawerItem(
+              icon: Icons.person,
+              text: 'Profil',
+              onTap: () => _navigateTo(context, const ProfileView()),
+            ),
+            const Divider(color: Colors.white70, thickness: 1),
+            _buildDrawerItem(
+              icon: Icons.home,
+              text: 'Ana Sayfa',
+              onTap: () {
+                Navigator.pop(context);
+                setState(() => _currentIndex = 1);
+              },
+            ),
+            _buildDrawerItem(
+              icon: Icons.add_circle,
+              text: 'Ürün Ekle',
+              onTap: () {
+                Navigator.pop(context);
+                setState(() => _currentIndex = 2);
+              },
+            ),
+            _buildDrawerItem(
+              icon: Icons.list,
+              text: 'Ürünlerim',
+              onTap: () {
+                Navigator.pop(context);
+                setState(() => _currentIndex = 0);
+              },
+            ),
+            const Divider(color: Colors.white70, thickness: 1),
+            _buildDrawerItem(
+              icon: Icons.info,
+              text: 'Hakkımızda',
+              onTap: () => _navigateTo(context, const AboutView()),
+            ),
+            _buildDrawerItem(
+              icon: Icons.report,
+              text: 'Şikayet Et',
+              onTap: () => _navigateTo(context, const ReportView()),
+            ),
+            const Divider(color: Colors.white70, thickness: 1),
+            _buildDrawerItem(
+              icon: Icons.logout,
+              text: 'Çıkış Yap',
+              iconColor: Colors.red,
+              onTap: () => signOut(context),
+            ),
+          ],
+        ),
+      ),
+    ).animate().fadeIn(duration: 400.ms).slide(begin: const Offset(-1, 0));
+  }
+
+  // Drawer item widget
+  Widget _buildDrawerItem({
+    required IconData icon,
+    required String text,
+    required VoidCallback onTap,
+    Color iconColor = Colors.black,
+    Color textColor = Colors.white,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: iconColor),
+      title: Text(text, style: TextStyle(color: textColor)),
+      onTap: onTap,
+    ).animate().slideX(curve: Curves.easeInOut, delay: 100.ms);
+  }
+
+  void _navigateTo(BuildContext context, Widget view) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => view));
+  }
+
+  // Bottom Navigation Bar
+  Widget _buildBottomNavigationBar() {
+    return AnimatedBottomNavigationBar(
+      icons: const [
+        Icons.list,
+        Icons.add_circle,
+      ],
+      activeIndex: _currentIndex == 1
+          ? 0
+          : _currentIndex == 0
+              ? 0
+              : 1,
+      backgroundColor: _backgroundColors[_currentIndex],
+      activeColor: Colors.white,
+      inactiveColor: Colors.black,
+      gapLocation: GapLocation.center,
+      notchSmoothness: NotchSmoothness.verySmoothEdge,
+      iconSize: 28,
+      onTap: (index) {
+        setState(() {
+          _currentIndex = index == 0 ? 0 : 2;
+        });
+      },
+      splashSpeedInMilliseconds: 300,
+      leftCornerRadius: 25,
+      rightCornerRadius: 25,
+    ).animate().fadeIn(duration: 500.ms);
+  }
+
+  // Floating Action Button
+  Widget _buildFloatingActionButton() {
+    return RotationTransition(
+      turns: Tween(begin: 0.0, end: 1.0).animate(_rotationController),
+      child: FloatingActionButton(
         onPressed: () {
           setState(() {
             _currentIndex = 1;
+            _changeTitleColor(); // Yeşil Piyasa yazısının rengini değiştir
           });
+          _rotationController.forward(
+              from: 0); // 360 derece döndürme animasyonu
         },
-        backgroundColor: Colors.green,
-        shape: const CircleBorder(),
-        child: const Icon(Icons.home,
-            color: Colors.white), // FAB'ın dairesel olmasını sağlar
+        backgroundColor: _backgroundColors[_currentIndex],
+        child: Icon(Icons.home, color: _titleColor),
       ),
     );
   }
 
-  Widget _buildBottomBarItem(IconData icon, String label, int index) {
-    final isSelected = _currentIndex == index;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _currentIndex = index;
-        });
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: isSelected ? Colors.white : Colors.black),
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? Colors.white : Colors.black,
-              fontSize: 20,
-            ),
-          ),
-        ],
-      ),
-    );
+  Future<bool> signOut(BuildContext context) async {
+    final userModel = Provider.of<UserModel>(context, listen: false);
+    return await userModel.signOut();
   }
 }
