@@ -1,7 +1,6 @@
-import 'dart:math';
-
-import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:animations/animations.dart';
+import 'package:clay_containers/widgets/clay_container.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -28,7 +27,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
-  int _currentIndex = 1;
+  int _currentIndex = 0;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<Widget> _pages = [
@@ -36,40 +35,15 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     const ProductsView(),
     const AddProductsView(),
   ];
+  late AnimationController _rotationController;
 
   final List<Color> _backgroundColors = [
-    const Color.fromARGB(255, 0, 254, 73), // Yeşil
-    const Color.fromARGB(255, 2, 171, 250), // Mavi
-    const Color.fromARGB(255, 249, 159, 2), // Turuncu
+    Colors.blueAccent, // Background for List
+    Colors.greenAccent, // Background for Home
+    Colors.orangeAccent, // Background for Add
   ];
 
-  final List<Color> _titleColors = [
-    Colors.white,
-    Colors.black,
-    Colors.redAccent,
-    Colors.deepPurple,
-    Colors.deepOrangeAccent,
-    Colors.pinkAccent,
-    Colors.purpleAccent,
-    Colors.orangeAccent,
-    Colors.indigoAccent,
-    Colors.lightGreenAccent,
-    Colors.brown,
-    Colors.grey,
-    Colors.blueGrey,
-    Colors.yellow,
-    Colors.red,
-    Colors.purple,
-    Colors.orange,
-    Colors.pink,
-    Colors.green,
-    Colors.amberAccent,
-    Colors.deepPurpleAccent,
-    Colors.black87,
-  ];
-
-  Color _titleColor = Colors.white;
-  late AnimationController _rotationController;
+  Color _currentBackgroundColor = Colors.blueAccent;
 
   @override
   void initState() {
@@ -86,22 +60,14 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  // Rastgele başlık rengi seçimi
-  void _changeTitleColor() {
-    final random = Random();
-    setState(() {
-      _titleColor = _titleColors[random.nextInt(_titleColors.length)];
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
       appBar: _buildAnimatedAppBar(),
-      drawer: _buildAnimatedDrawer(),
+      drawer: _buildDrawer(),
       body: Container(
-        color: _backgroundColors[_currentIndex],
+        color: _currentBackgroundColor,
         child: PageTransitionSwitcher(
           duration: const Duration(milliseconds: 700),
           reverse: _currentIndex != 1,
@@ -113,62 +79,40 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           child: _pages[_currentIndex],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: _buildFloatingActionButton(),
+      bottomNavigationBar: _buildAnimatedBottomNavigationBar(),
     );
   }
 
-  // Animasyonlu AppBar
+  // AppBar with animation
   PreferredSizeWidget _buildAnimatedAppBar() {
     return AppBar(
-      backgroundColor: _backgroundColors[_currentIndex],
       leading: IconButton(
         icon: const Icon(Icons.menu),
         onPressed: () => scaffoldKey.currentState?.openDrawer(),
-      )
-          .animate(
-            onPlay: (controller) => controller.repeat(reverse: true),
-          )
-          .scaleXY(end: 1.1, curve: Curves.easeInOut),
+      ),
       actions: [
         IconButton(
           icon: const Icon(Icons.search),
           onPressed: () {
-            // Arama butonuna basıldığında yapılacak işlem (boş fonksiyon)
+            // Action when search button is pressed
           },
-        )
-            .animate(
-              onPlay: (controller) => controller.repeat(reverse: true),
-            )
-            .scaleXY(end: 1.1, curve: Curves.easeInOut),
+        ),
       ],
       flexibleSpace: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [_backgroundColors[_currentIndex], Colors.green],
+            colors: [Colors.green, Colors.lightGreen],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
       ),
-      title: Animate(
-        effects: const [
-          SlideEffect(
-            duration: Duration(milliseconds: 700),
-            begin: Offset(-0.5, 0),
-            curve: Curves.easeOut,
-          ),
-          FadeEffect(duration: Duration(milliseconds: 500))
-        ],
-        child: Text(
-          'Yeşil Piyasa',
-          style: GoogleFonts.pacifico(
-            textStyle: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: _titleColor, // Rastgele renk buradan uygulanacak
-            ),
+      title: Text(
+        'Yeşil Piyasa',
+        style: GoogleFonts.pacifico(
+          textStyle: const TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
@@ -178,8 +122,49 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     );
   }
 
-  // Animasyonlu Drawer
-  Widget _buildAnimatedDrawer() {
+  // Animated BottomNavigationBar as a method in HomeView
+  Widget _buildAnimatedBottomNavigationBar() {
+    return CurvedNavigationBar(
+      height: 75,
+      color: Colors.grey.shade200,
+      backgroundColor: _currentBackgroundColor,
+      items: <Widget>[
+        ClayContainer(
+          spread: 1,
+          borderRadius: 25,
+          color: _currentIndex == 0 ? Colors.blue : Colors.grey,
+          height: 50,
+          width: 50,
+          child: const Icon(Icons.list, size: 30),
+        ),
+        ClayContainer(
+          spread: 1,
+          borderRadius: 25,
+          color: _currentIndex == 1 ? Colors.green : Colors.grey,
+          height: 50,
+          width: 50,
+          child: const Icon(Icons.home, size: 30),
+        ),
+        ClayContainer(
+          spread: 1,
+          borderRadius: 25,
+          color: _currentIndex == 2 ? Colors.orange : Colors.grey,
+          height: 50,
+          width: 50,
+          child: const Icon(Icons.add, size: 30),
+        ),
+      ],
+      onTap: (index) async {
+        setState(() {
+          _currentIndex = index;
+          _currentBackgroundColor = _backgroundColors[index];
+        });
+      },
+    );
+  }
+
+  // Drawer without animation
+  Widget _buildDrawer() {
     return Drawer(
       child: Container(
         decoration: const BoxDecoration(
@@ -259,7 +244,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           ],
         ),
       ),
-    ).animate().fadeIn(duration: 400.ms).slide(begin: const Offset(-1, 0));
+    );
   }
 
   // Drawer item widget
@@ -279,54 +264,6 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   void _navigateTo(BuildContext context, Widget view) {
     Navigator.push(context, MaterialPageRoute(builder: (context) => view));
-  }
-
-  // Bottom Navigation Bar
-  Widget _buildBottomNavigationBar() {
-    return AnimatedBottomNavigationBar(
-      icons: const [
-        Icons.list,
-        Icons.add_circle,
-      ],
-      activeIndex: _currentIndex == 1
-          ? 0
-          : _currentIndex == 0
-              ? 0
-              : 1,
-      backgroundColor: _backgroundColors[_currentIndex],
-      activeColor: Colors.white,
-      inactiveColor: Colors.black,
-      gapLocation: GapLocation.center,
-      notchSmoothness: NotchSmoothness.verySmoothEdge,
-      iconSize: 28,
-      onTap: (index) {
-        setState(() {
-          _currentIndex = index == 0 ? 0 : 2;
-        });
-      },
-      splashSpeedInMilliseconds: 300,
-      leftCornerRadius: 25,
-      rightCornerRadius: 25,
-    ).animate().fadeIn(duration: 500.ms);
-  }
-
-  // Floating Action Button
-  Widget _buildFloatingActionButton() {
-    return RotationTransition(
-      turns: Tween(begin: 0.0, end: 1.0).animate(_rotationController),
-      child: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            _currentIndex = 1;
-            _changeTitleColor(); // Yeşil Piyasa yazısının rengini değiştir
-          });
-          _rotationController.forward(
-              from: 0); // 360 derece döndürme animasyonu
-        },
-        backgroundColor: _backgroundColors[_currentIndex],
-        child: Icon(Icons.home, color: _titleColor),
-      ),
-    );
   }
 
   Future<bool> signOut(BuildContext context) async {
