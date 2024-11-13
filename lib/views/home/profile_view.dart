@@ -1,7 +1,11 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:yesil_piyasa/core/widgets/my_alert_dialog.dart';
 import 'package:yesil_piyasa/viewmodel/user_model.dart';
 
 class ProfileView extends StatefulWidget {
@@ -12,28 +16,148 @@ class ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileView> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final ImagePicker picker = ImagePicker();
+
   File? profilePhoto;
   late TextEditingController controllerAboutMe;
   late TextEditingController controllerUserName;
+  late TextEditingController controllerEmail;
+  late TextEditingController controllerPhoneNumber;
+  late TextEditingController controllerLocation;
 
   @override
   void initState() {
     super.initState();
-    controllerAboutMe = TextEditingController();
-    controllerUserName = TextEditingController();
+    final userModel = Provider.of<UserModel>(context, listen: false);
+
+    controllerAboutMe =
+        TextEditingController(text: userModel.user?.about ?? '');
+    controllerUserName =
+        TextEditingController(text: userModel.user?.name ?? '');
+    controllerEmail = TextEditingController(text: userModel.user?.email ?? '');
+    controllerPhoneNumber =
+        TextEditingController(text: userModel.user?.phoneNumber ?? '');
+    controllerLocation =
+        TextEditingController(text: userModel.user?.location ?? '');
   }
 
   @override
   void dispose() {
     controllerAboutMe.dispose();
     controllerUserName.dispose();
+    controllerEmail.dispose();
+    controllerPhoneNumber.dispose();
+    controllerLocation.dispose();
     super.dispose();
+  }
+
+  Future<void> _updateUserData(String field, String newValue) async {
+    UserModel userModel = Provider.of<UserModel>(context, listen: false);
+    await userModel.updateUserData(field, userModel.user!.userID, newValue);
+  }
+
+  void _showEditDialog(BuildContext context, String title,
+      TextEditingController controller, String field) {
+    String previousValue = controller.text; // Mevcut değeri kaydediyoruz
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        backgroundColor: Colors.green.shade50,
+        title: Row(
+          children: [
+            Icon(Icons.agriculture, color: Colors.green.shade700, size: 28),
+            const SizedBox(width: 10),
+            Text(
+              title,
+              style: TextStyle(
+                color: Colors.green.shade800,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        content: Form(
+          key: _formKey,
+          child: TextFormField(
+            controller: controller,
+            cursorColor: Colors.green.shade700,
+            keyboardType: field == 'phoneNumber'
+                ? TextInputType.phone // Telefon numarası için sayısal klavye
+                : TextInputType.emailAddress, // E-posta için e-posta klavyesi
+            decoration: InputDecoration(
+              hintText: 'Enter your $title',
+              hintStyle: TextStyle(color: Colors.green.shade300),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: Colors.green.shade600, width: 2),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: Colors.green.shade300),
+              ),
+            ),
+            inputFormatters: field == 'phoneNumber'
+                ? [
+                    LengthLimitingTextInputFormatter(11),
+                    FilteringTextInputFormatter.digitsOnly
+                  ]
+                : null,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return '$title boş bırakılamaz';
+              }
+              if (field == 'email' &&
+                  !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                return 'Geçerli bir e-posta adresi girin';
+              }
+              if (field == 'phoneNumber' &&
+                  (value.length < 10 || value.length > 11)) {
+                return 'Telefon numarası 10 veya 11 rakam olmalı';
+              }
+              return null;
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // Önceki değeri geri yüklüyoruz
+              controller.text = previousValue;
+              Navigator.pop(context);
+            },
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.green.shade600),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green.shade700,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: () async {
+              if (_formKey.currentState?.validate() == true) {
+                await _updateUserData(field, controller.text);
+                Navigator.pop(context);
+              }
+            },
+            child: const Text(
+              'Save',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    UserModel userModel = Provider.of<UserModel>(context, listen: false);
-    print(userModel.user.toString());
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -57,138 +181,210 @@ class _ProfileViewState extends State<ProfileView> {
         ),
         child: SingleChildScrollView(
           child: Center(
-            child: Consumer<UserModel>(
-              builder: (context, userModel, child) {
-                controllerAboutMe.text = userModel.user?.about ?? '';
-                controllerUserName.text = userModel.user?.name ?? '';
-
-                return Column(
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                Stack(
+                  clipBehavior: Clip.none,
                   children: [
-                    const SizedBox(height: 20),
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        CircleAvatar(
-                            radius: 80,
-                            backgroundColor: Colors.grey.shade200,
-                            backgroundImage: NetworkImage(
-                                    userModel.user?.profileImageUrl ?? '')
-                                as ImageProvider),
-                        Positioned(
-                          bottom: -10,
-                          right: -10,
-                          child: FloatingActionButton(
-                            onPressed: () {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (context) {
-                                  return SizedBox(
-                                    height: 170,
-                                    child: Column(
-                                      children: [
-                                        ListTile(
-                                          leading: const Icon(Icons.camera,
-                                              color: Colors.green),
-                                          title: const Text('Fotoğraf Çek'),
-                                          onTap: () {},
-                                        ),
-                                        ListTile(
-                                          leading: const Icon(Icons.image,
-                                              color: Colors.green),
-                                          title: const Text('Galeriden Seç'),
-                                          onTap: () {},
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                            backgroundColor: Colors.green,
-                            child: const Icon(Icons.camera_alt,
-                                color: Colors.white),
-                          ),
-                        ),
-                      ],
+                    CircleAvatar(
+                      radius: 80,
+                      backgroundColor: Colors.grey.shade200,
+                      backgroundImage: NetworkImage(
+                          Provider.of<UserModel>(context)
+                                  .user
+                                  ?.profileImageUrl ??
+                              ''),
                     ),
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 16.0, right: 16.0, top: 30.0),
-                      child: Card(
-                        color: Colors.white60,
-                        shadowColor: Colors.green,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16.0),
-                        ),
-                        elevation: 5,
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ListTile(
-                                title: Text(
-                                  userModel.user?.name ?? '',
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                leading: const Icon(Icons.person,
-                                    color: Colors.green),
-                                trailing: IconButton(
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.edit,
+                    Positioned(
+                      bottom: -10,
+                      right: -10,
+                      child: FloatingActionButton(
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (context) => Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ListTile(
+                                  leading: const Icon(Icons.camera,
                                       color: Colors.green),
+                                  title: const Text('Fotoğraf Çek'),
+                                  onTap: () {
+                                    takeAPhoto();
+                                  },
                                 ),
-                              ),
-                              const SizedBox(height: 10),
-                              ListTile(
-                                title: Text(
-                                  userModel.user?.about ??
-                                      'Kendiniz hakkında bir şeyler yazın...',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                leading:
-                                    const Icon(Icons.book, color: Colors.green),
-                                trailing: IconButton(
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.edit,
+                                ListTile(
+                                  leading: const Icon(Icons.image,
                                       color: Colors.green),
+                                  title: const Text('Galeriden Seç'),
+                                  onTap: () {
+                                    selectTheGallery();
+                                  },
                                 ),
-                              ),
-                              const SizedBox(height: 20),
-                              ListTile(
-                                title: Text(
-                                  userModel.user?.email ?? '',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                leading: const Icon(Icons.email,
-                                    color: Colors.green),
-                              ),
-                              const SizedBox(height: 20),
-                            ],
-                          ),
-                        ),
+                              ],
+                            ),
+                          );
+                        },
+                        backgroundColor: Colors.green,
+                        child:
+                            const Icon(Icons.camera_alt, color: Colors.white),
                       ),
                     ),
                   ],
-                );
-              },
+                ),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 30.0),
+                  child: Card(
+                    color: Colors.white60,
+                    shadowColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    elevation: 5,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildEditableField(
+                            title: 'Kullanıcı Adı',
+                            icon: Icons.person,
+                            controller: controllerUserName,
+                            field: 'name',
+                          ),
+                          _buildEditableField(
+                            title: 'Açıklama',
+                            icon: Icons.book,
+                            controller: controllerAboutMe,
+                            field: 'about',
+                          ),
+                          _buildEditableField(
+                            title: 'E-posta',
+                            icon: Icons.email,
+                            controller: controllerEmail,
+                            field: 'email',
+                          ),
+                          _buildEditableField(
+                            title: 'Telefon Numarası',
+                            icon: Icons.phone,
+                            controller: controllerPhoneNumber,
+                            field: 'phoneNumber',
+                          ),
+                          _buildEditableField(
+                            title: 'Konum',
+                            icon: Icons.location_on,
+                            controller: controllerLocation,
+                            field: 'location',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildEditableField({
+    required String title,
+    required IconData icon,
+    required TextEditingController controller,
+    required String field,
+  }) {
+    return ListTile(
+      title: Text(
+        controller.text,
+        style: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
+      ),
+      leading: Icon(icon, color: Colors.green),
+      trailing: IconButton(
+        onPressed: field == 'email'
+            ? null
+            : () {
+                _showEditDialog(context, title, controller, field);
+              },
+        icon: const Icon(Icons.edit, color: Colors.green),
+      ),
+    );
+  }
+
+  Future<void> takeAPhoto() async {
+    final photo = await picker.pickImage(source: ImageSource.camera);
+    if (photo != null) {
+      setState(() {
+        profilePhoto = File(photo.path);
+      });
+      _updateProfilePhoto();
+    }
+  }
+
+  Future<void> selectTheGallery() async {
+    final image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        profilePhoto = File(image.path);
+      });
+      _updateProfilePhoto();
+    }
+  }
+
+  Future<void> _updateProfilePhoto() async {
+    final userModel = Provider.of<UserModel>(context, listen: false);
+
+    if (profilePhoto != null) {
+      try {
+        var url = await userModel.uploadFile(
+            userModel.user!.userID, "profile_photo", profilePhoto!);
+        if (mounted) {
+          if (url.isEmpty) {
+            showDialog(
+              context: context,
+              builder: (context) {
+                profilePhoto = null;
+                return MyAlertDialog(
+                    title: 'Photo could not be saved',
+                    contentText: 'Try Again');
+              },
+            );
+          } else {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return MyAlertDialog(
+                    title: 'Photo saved', contentText: 'You can leave');
+              },
+            );
+          }
+        }
+        if (kDebugMode) {
+          print('Received URL: $url');
+        }
+      } catch (e) {
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) {
+              profilePhoto = null;
+              return MyAlertDialog(
+                  title: 'Error', contentText: 'An error occurred: $e');
+            },
+          );
+        }
+        if (kDebugMode) {
+          print('Error: $e');
+        }
+      }
+    }
   }
 }

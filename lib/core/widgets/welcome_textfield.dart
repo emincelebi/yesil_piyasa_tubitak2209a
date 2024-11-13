@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // FilteringTextInputFormatter için
 
-class WelcomeTextField extends StatelessWidget {
+class WelcomeTextField extends StatefulWidget {
   final String hintText; // İpucu metni
   final IconData icon; // İlgili ikon
   final bool obscureText; // Şifre alanı olup olmadığını belirtir
@@ -11,6 +12,8 @@ class WelcomeTextField extends StatelessWidget {
   final double borderRadius; // Kenar yuvarlama oranı
   final String? Function(String?)? validator; // Doğrulama işlevi
   final TextEditingController? controller; // Metin düzenleyici kontrolü
+  final List<TextInputFormatter>? inputFormatters; // Giriş formatlayıcıları
+  final Function(String)? onChanged; // Değişiklik olduğunda çalışacak fonksiyon
 
   const WelcomeTextField({
     super.key,
@@ -24,26 +27,57 @@ class WelcomeTextField extends StatelessWidget {
     this.borderRadius = 30.0, // Varsayılan kenar yuvarlama oranı
     this.validator, // Doğrulama işlevi
     this.controller, // Metin düzenleyici kontrolü
+    this.inputFormatters, // Giriş formatlayıcıları
+    this.onChanged, // Değişiklik fonksiyonu
   });
+
+  @override
+  _WelcomeTextFieldState createState() => _WelcomeTextFieldState();
+}
+
+class _WelcomeTextFieldState extends State<WelcomeTextField> {
+  bool _isObscure = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isObscure = widget.obscureText;
+  }
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: controller,
-      obscureText: obscureText, // Şifre alanıysa gizli yazı
-      keyboardType: keyboardType, // Klavye tipi
-      validator: validator, // Doğrulama işlevi
+      controller: widget.controller,
+      obscureText: _isObscure, // Şifre alanıysa gizli yazı
+      keyboardType: widget.keyboardType, // Klavye tipi
+      validator: widget.validator, // Doğrulama işlevi
+      inputFormatters: widget.inputFormatters, // Giriş formatlayıcıları
+      onChanged: widget.onChanged, // Değişikliklerde çalışacak fonksiyon
       decoration: InputDecoration(
-        hintText: hintText,
-        prefixIcon: Icon(icon), // İlgili ikon
+        errorStyle: const TextStyle(color: Colors.white),
+        hintText: widget.hintText,
+        prefixIcon: Icon(widget.icon), // İlgili ikon
+        suffixIcon: widget.obscureText
+            ? IconButton(
+                icon: Icon(
+                  _isObscure ? Icons.visibility : Icons.visibility_off,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _isObscure = !_isObscure;
+                  });
+                },
+              )
+            : null, // Sadece şifre alanıysa göz ikonu ekle
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadius), // Oval kenarlar
-          borderSide: BorderSide(color: borderColor!), // Kenar rengi
+          borderRadius:
+              BorderRadius.circular(widget.borderRadius), // Oval kenarlar
+          borderSide: BorderSide(color: widget.borderColor!), // Kenar rengi
         ),
         filled: true,
-        fillColor: fillColor, // Arka plan rengi
+        fillColor: widget.fillColor, // Arka plan rengi
       ),
-      style: TextStyle(color: textColor), // Yazı rengi
+      style: TextStyle(color: widget.textColor), // Yazı rengi
     );
   }
 }

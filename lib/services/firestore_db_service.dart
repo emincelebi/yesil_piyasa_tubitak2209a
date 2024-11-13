@@ -26,4 +26,48 @@ class FireStoreDBService implements DbBase {
     }
     return userObject;
   }
+
+  @override
+  Future<bool> updateUserData(
+      String field, String userID, String newValue) async {
+    var users = await _firebaseDB
+        .collection('users')
+        .where(field, isEqualTo: newValue)
+        .get();
+    if (users.docs.isNotEmpty) {
+      return false;
+    } else {
+      await _firebaseDB
+          .collection('users')
+          .doc(userID)
+          .update({field: newValue});
+      return true;
+    }
+  }
+
+  @override
+  Future<bool> updateAboutMe(String userID, String newAbout) async {
+    var users = await _firebaseDB
+        .collection('users')
+        .where('about', isEqualTo: newAbout)
+        .get();
+    if (users.docs.isNotEmpty) {
+      return false;
+    } else {
+      await _firebaseDB
+          .collection('users')
+          .doc(userID)
+          .update({'about': newAbout});
+      return true;
+    }
+  }
+
+  @override
+  Future<bool> updateProfilePhoto(String userId, String profilePhotoURL) async {
+    await _firebaseDB
+        .collection('users')
+        .doc(userId)
+        .update({'proifleImageUrl': profilePhotoURL});
+    return true;
+  }
 }
