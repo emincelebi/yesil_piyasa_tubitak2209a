@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:yesil_piyasa/core/components/validate_check.dart';
 import 'package:yesil_piyasa/locator.dart';
@@ -95,5 +97,24 @@ class UserModel with ChangeNotifier implements AuthBase {
       result = true;
     }
     return result;
+  }
+
+  Future<bool> updateUserData(
+      String field, String userID, String newValue) async {
+    bool success =
+        await _userRepository.updateUserData(field, userID, newValue);
+    if (success) {
+      user!.name = newValue;
+      notifyListeners();
+    }
+    return success;
+  }
+
+  Future<String> uploadFile(
+      String userId, String fileType, File uploadFile) async {
+    String downloadLink =
+        await _userRepository.uploadFile(userId, fileType, uploadFile);
+    notifyListeners();
+    return downloadLink;
   }
 }

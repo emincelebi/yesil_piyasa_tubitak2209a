@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:yesil_piyasa/core/components/validate_check.dart';
 import 'package:yesil_piyasa/core/widgets/error_display.dart';
@@ -182,11 +183,11 @@ class _WelcomeViewState extends State<WelcomeView>
             WelcomeTextField(
               hintText: 'Şifreniz...',
               icon: Icons.lock,
-              obscureText: true,
+              obscureText: true, // Şifre alanı olarak ayarlanır
               controller: _passwordController,
               validator: (value) {
-                if (value == null || value.length < 6) {
-                  return 'Şifreniz en az 6 karakter olmalıdır';
+                if (value == null || value.isEmpty) {
+                  return 'Lütfen şifrenizi girin';
                 }
                 return null;
               },
@@ -196,7 +197,8 @@ class _WelcomeViewState extends State<WelcomeView>
               text: 'Giriş Yap',
               onPressed: () {
                 if (_formKeyLogin.currentState?.validate() ?? false) {
-                  signInEmailAndPassword(email, password);
+                  signInEmailAndPassword(
+                      _emailController.text, _passwordController.text);
                 }
               },
             ),
@@ -257,12 +259,18 @@ class _WelcomeViewState extends State<WelcomeView>
                 validator: ValidateCheck().validateEmail,
               ),
               const SizedBox(height: 10),
+              // Şifre alanını WelcomeTextField ile değiştirdik
               WelcomeTextField(
                 hintText: 'Şifreniz...',
                 icon: Icons.lock,
-                obscureText: true,
+                obscureText: true, // Şifre alanı olduğu için true
                 controller: _passwordController,
-                validator: ValidateCheck().validatePassword,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Lütfen şifrenizi girin';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 10),
               WelcomeTextField(
@@ -280,10 +288,25 @@ class _WelcomeViewState extends State<WelcomeView>
               WelcomeTextField(
                 hintText: 'Numaranız...',
                 icon: Icons.phone,
+                keyboardType: TextInputType.phone,
                 controller: phoneController,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly
+                ], // Sadece rakam
+                onChanged: (value) {
+                  if (value.length > 11) {
+                    phoneController.text = value.substring(
+                        0, 11); // 11 karakteri aştığında, fazla karakteri kes
+                    phoneController.selection = TextSelection.fromPosition(
+                        const TextPosition(offset: 11)); // Cursor'ı sona koy
+                  }
+                },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Lütfen numaranızı girin';
+                  }
+                  if (value.length != 10 && value.length != 11) {
+                    return 'Numara 10 veya 11 haneli olmalıdır';
                   }
                   return null;
                 },
@@ -295,11 +318,11 @@ class _WelcomeViewState extends State<WelcomeView>
                   if (_formKeySignup.currentState?.validate() ?? false) {
                     // Kayıt işlemi
                     signUpEmailAndPassword(
-                      email,
-                      password,
+                      _emailController.text,
+                      _passwordController.text,
                       MyUser(
                           userID: "1",
-                          email: email,
+                          email: _emailController.text,
                           name: nameController.text,
                           surName: surNameController.text,
                           location: locationController.text,

@@ -90,18 +90,16 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         icon: const Icon(Icons.menu),
         onPressed: () => scaffoldKey.currentState?.openDrawer(),
       ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.search),
-          onPressed: () {
-            // Action when search button is pressed
-          },
-        ),
-      ],
+      actions: [Image.asset('assets/images/logo.png')],
       flexibleSpace: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.green, Colors.lightGreen],
+            colors: [
+              _currentIndex == 0
+                  ? Colors.blue
+                  : (_currentIndex == 1 ? Colors.green : Colors.orange),
+              Colors.grey
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -126,13 +124,15 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   Widget _buildAnimatedBottomNavigationBar() {
     return CurvedNavigationBar(
       height: 75,
-      color: Colors.grey.shade200,
-      backgroundColor: _currentBackgroundColor,
+      color: _currentIndex == 0
+          ? Colors.blue
+          : (_currentIndex == 1 ? Colors.green : Colors.orange),
+      backgroundColor: Colors.white,
       items: <Widget>[
         ClayContainer(
           spread: 1,
           borderRadius: 25,
-          color: _currentIndex == 0 ? Colors.blue : Colors.grey,
+          color: _currentIndex == 0 ? Colors.blue : Colors.white,
           height: 50,
           width: 50,
           child: const Icon(Icons.list, size: 30),
@@ -140,7 +140,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         ClayContainer(
           spread: 1,
           borderRadius: 25,
-          color: _currentIndex == 1 ? Colors.green : Colors.grey,
+          color: _currentIndex == 1 ? Colors.green : Colors.white,
           height: 50,
           width: 50,
           child: const Icon(Icons.home, size: 30),
@@ -148,7 +148,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         ClayContainer(
           spread: 1,
           borderRadius: 25,
-          color: _currentIndex == 2 ? Colors.orange : Colors.grey,
+          color: _currentIndex == 2 ? Colors.orange : Colors.white,
           height: 50,
           width: 50,
           child: const Icon(Icons.add, size: 30),
@@ -167,9 +167,14 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   Widget _buildDrawer() {
     return Drawer(
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.teal, Colors.blueAccent],
+            colors: [
+              _currentIndex == 0
+                  ? Colors.blue
+                  : (_currentIndex == 1 ? Colors.green : Colors.orange),
+              Colors.grey
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
