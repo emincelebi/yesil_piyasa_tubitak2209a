@@ -83,14 +83,14 @@ class _SettingsViewState extends State<SettingsView> {
             ),
             const Divider(),
 
-            // Yardım ve Destek
             ListTile(
-              leading: Icon(Icons.help, color: Colors.green[800]),
-              title: Text(tr('help_and_support')),
+              leading: Icon(Icons.help_outline, color: Colors.green[800]),
+              title: Text(tr('faq')),
               onTap: () {
-                // Buraya destek sayfasına yönlendirme yapılabilir.
+                _showFAQBottomSheet(context);
               },
             ),
+            const Divider(),
           ],
         ),
       ),
@@ -193,6 +193,105 @@ class _SettingsViewState extends State<SettingsView> {
             const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
           ],
         ),
+      ),
+    );
+  }
+
+  // Sıkça Sorulan Sorular Alt Sayfası
+  void _showFAQBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                tr('faq'),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              _buildFAQItem(
+                context,
+                question: tr('faq_question_1'),
+                answer: tr('faq_answer_1'),
+              ),
+              _buildFAQItem(
+                context,
+                question: tr('faq_question_2'),
+                answer: tr('faq_answer_2'),
+              ),
+              _buildFAQItem(
+                context,
+                question: tr('faq_question_3'),
+                answer: tr('faq_answer_3'),
+              ),
+              _buildFAQItem(
+                context,
+                question: tr('faq_question_4'),
+                answer: tr('faq_answer_4'),
+              ),
+              _buildFAQItem(
+                context,
+                question: tr('faq_question_5'),
+                answer: tr('faq_answer_5'),
+              ),
+              _buildFAQItem(
+                context,
+                question: tr('faq_question_6'),
+                answer: tr('faq_answer_6'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // SSS Öğesi
+  Widget _buildFAQItem(
+    BuildContext context, {
+    required String question,
+    required String answer,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: ExpansionTile(
+        tilePadding: EdgeInsets.zero,
+        title: Text(
+          question,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              answer,
+              style: const TextStyle(color: Colors.grey),
+            ),
+          ),
+        ],
       ),
     );
   }

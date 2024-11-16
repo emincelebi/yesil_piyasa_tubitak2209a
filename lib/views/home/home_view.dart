@@ -228,7 +228,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                     builder: (context) => const SettingsView(),
                   ),
                 );
-                if (result != null) {
+                if (true) {
                   print('Dönen değer: $result');
                   setState(() {
                     // state değişikliklerini burada uygulayın.
