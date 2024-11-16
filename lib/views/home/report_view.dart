@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -9,55 +11,66 @@ class ReportView extends StatefulWidget {
   _ReportViewState createState() => _ReportViewState();
 }
 
-class _ReportViewState extends State<ReportView> {
+class _ReportViewState extends State<ReportView>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _telefonController =
       TextEditingController(text: '0');
   final TextEditingController _sikayetController = TextEditingController();
   final TextEditingController _konuController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
+  late final AnimationController _animationController;
+  late final Animation<double> _rotationAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Animasyon kontrolcüsü ve animasyon tanımı
+    _animationController = AnimationController(
+      duration: const Duration(seconds: 6),
+      vsync: this,
+    )..repeat(); // Sonsuz döngü
+
+    _rotationAnimation = Tween<double>(begin: 0, end: 2 * pi).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.linear),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
   Future<void> _sikayetGonder() async {
     if (_formKey.currentState!.validate()) {
+      // E-posta içeriği
       final Uri emailUri = Uri(
         scheme: 'mailto',
         path: 'piyasayesil@gmail.com',
-        queryParameters: {
+        query: Uri(queryParameters: {
           'subject': _konuController.text,
           'body':
               'Telefon Numarası: ${_telefonController.text}\n\nŞikayet: ${_sikayetController.text}',
-        },
+        }).query,
       );
 
-      // Simüle edilmiş e-posta gönderme
-      final success = await _sendEmail(emailUri);
-
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Başarıyla gönderildi")),
-        );
-        _telefonController.text = '0';
-        _sikayetController.clear();
-        _konuController.clear();
+      // Mail uygulamasını aç
+      if (await canLaunchUrl(emailUri)) {
+        await launchUrl(emailUri);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Gönderim başarısız, tekrar deneyin")),
+          const SnackBar(
+            content: Text(
+              'Mail uygulaması açılamadı.',
+              style: TextStyle(
+                  color: Colors.white), // Metin rengini beyaz yapıyoruz.
+            ),
+            backgroundColor: Colors.green, // Arka plan rengini yeşil yapıyoruz.
+          ),
         );
       }
-    }
-  }
-
-  Future<bool> _sendEmail(Uri emailUri) async {
-    try {
-      // E-posta API'nize burada bağlanabilirsiniz.
-      // Bu örnekte canLaunch ve launch simüle ediliyor:
-      if (await canLaunch(emailUri.toString())) {
-        await launch(emailUri.toString());
-        return true;
-      } else {
-        return false;
-      }
-    } catch (e) {
-      return false;
     }
   }
 
@@ -100,9 +113,22 @@ class _ReportViewState extends State<ReportView> {
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
-                  Image.asset(
-                    'assets/images/logo.png', // Kendi logonuzla değiştirin
-                    height: screenSize.height * 0.15,
+                  AnimatedBuilder(
+                    animation: _rotationAnimation,
+                    builder: (context, child) {
+                      return Transform(
+                        alignment: Alignment.center,
+                        transform: Matrix4.identity()
+                          ..setEntry(3, 2, 0.002) // Perspektif efekti
+                          ..rotateY(
+                              _rotationAnimation.value), // Y ekseninde dönme
+                        child: child,
+                      );
+                    },
+                    child: Image.asset(
+                      'assets/images/logo.png', // Logonuzun yolu
+                      height: screenSize.height * 0.15,
+                    ),
                   ),
                   const Text(
                     'Şikayet Et',
