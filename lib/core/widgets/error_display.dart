@@ -1,4 +1,5 @@
 import 'package:another_flushbar/flushbar.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:yesil_piyasa/core/components/error_handling.dart';
 
@@ -69,9 +70,9 @@ class ErrorDisplay {
               children: [
                 const Icon(Icons.error, color: Colors.redAccent, size: 40),
                 const SizedBox(height: 10),
-                const Text(
-                  "Hata",
-                  style: TextStyle(
+                Text(
+                  "error".tr(),
+                  style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.redAccent),
@@ -92,7 +93,7 @@ class ErrorDisplay {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: const Text("Tamam"),
+                  child: Text("ok".tr()),
                 )
               ],
             ),

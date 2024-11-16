@@ -1,18 +1,22 @@
 import 'package:animations/animations.dart';
 import 'package:clay_containers/widgets/clay_container.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:yesil_piyasa/model/my_user.dart';
 import 'package:yesil_piyasa/viewmodel/user_model.dart';
-import 'package:yesil_piyasa/views/home/about_view.dart';
 import 'package:yesil_piyasa/views/home/add_products.dart';
+import 'package:yesil_piyasa/views/home/drawer_views/about_view.dart';
+import 'package:yesil_piyasa/views/home/drawer_views/favorites_view.dart';
+import 'package:yesil_piyasa/views/home/drawer_views/report_view.dart';
+import 'package:yesil_piyasa/views/home/drawer_views/settings_view.dart';
+import 'package:yesil_piyasa/views/home/drawer_views/truck_drivers_view.dart';
 import 'package:yesil_piyasa/views/home/my_products.dart';
 import 'package:yesil_piyasa/views/home/products.dart';
 import 'package:yesil_piyasa/views/home/profile_view.dart';
-import 'package:yesil_piyasa/views/home/report_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({
@@ -200,49 +204,53 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
             ),
             _buildDrawerItem(
               icon: Icons.person,
-              text: 'Profil',
+              text: "profile".tr(),
               onTap: () => _navigateTo(context, const ProfileView()),
             ),
             const Divider(color: Colors.white70, thickness: 1),
             _buildDrawerItem(
-              icon: Icons.home,
-              text: 'Ana Sayfa',
-              onTap: () {
-                Navigator.pop(context);
-                setState(() => _currentIndex = 1);
-              },
+              icon: Icons.local_shipping,
+              text: 'cargo_transport'.tr(),
+              onTap: () => _navigateTo(context, const TruckDriversView()),
             ),
             _buildDrawerItem(
-              icon: Icons.add_circle,
-              text: 'Ürün Ekle',
-              onTap: () {
-                Navigator.pop(context);
-                setState(() => _currentIndex = 2);
-              },
+              icon: Icons.favorite,
+              text: 'favorites'.tr(),
+              onTap: () => _navigateTo(context, const FavoritesView()),
             ),
             _buildDrawerItem(
-              icon: Icons.list,
-              text: 'Ürünlerim',
-              onTap: () {
-                Navigator.pop(context);
-                setState(() => _currentIndex = 0);
+              icon: Icons.settings,
+              text: 'settings'.tr(),
+              onTap: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsView(),
+                  ),
+                );
+                if (result != null) {
+                  print('Dönen değer: $result');
+                  setState(() {
+                    // state değişikliklerini burada uygulayın.
+                  });
+                }
               },
             ),
             const Divider(color: Colors.white70, thickness: 1),
             _buildDrawerItem(
               icon: Icons.info,
-              text: 'Hakkımızda',
+              text: 'about'.tr(),
               onTap: () => _navigateTo(context, const AboutView()),
             ),
             _buildDrawerItem(
               icon: Icons.report,
-              text: 'Şikayet Et',
+              text: 'report'.tr(),
               onTap: () => _navigateTo(context, const ReportView()),
             ),
             const Divider(color: Colors.white70, thickness: 1),
             _buildDrawerItem(
               icon: Icons.logout,
-              text: 'Çıkış Yap',
+              text: 'logout'.tr(),
               iconColor: Colors.red,
               onTap: () => signOut(context),
             ),

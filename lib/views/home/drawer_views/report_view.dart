@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -8,6 +9,7 @@ class ReportView extends StatefulWidget {
   const ReportView({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ReportViewState createState() => _ReportViewState();
 }
 
@@ -52,7 +54,7 @@ class _ReportViewState extends State<ReportView>
         query: Uri(queryParameters: {
           'subject': _konuController.text,
           'body':
-              'Telefon Numarası: ${_telefonController.text}\n\nŞikayet: ${_sikayetController.text}',
+              '${tr('phoneNumber')}: ${_telefonController.text}\n\n${tr('complaint')}: ${_sikayetController.text}'
         }).query,
       );
 
@@ -60,11 +62,12 @@ class _ReportViewState extends State<ReportView>
       if (await canLaunchUrl(emailUri)) {
         await launchUrl(emailUri);
       } else {
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              'Mail uygulaması açılamadı.',
-              style: TextStyle(
+              'mail_app_could_not_open'.tr(),
+              style: const TextStyle(
                   color: Colors.white), // Metin rengini beyaz yapıyoruz.
             ),
             backgroundColor: Colors.green, // Arka plan rengini yeşil yapıyoruz.
@@ -77,7 +80,7 @@ class _ReportViewState extends State<ReportView>
   String? _telefonuDogrula(String? deger) {
     final telefon = deger ?? '';
     if (telefon.length != 11 || !RegExp(r'^0\d{10}$').hasMatch(telefon)) {
-      return 'Telefon numarası 0 ile başlamalı ve 11 haneli olmalı';
+      return 'phone_number_warning'.tr();
     }
     return null;
   }
@@ -130,10 +133,10 @@ class _ReportViewState extends State<ReportView>
                       height: screenSize.height * 0.15,
                     ),
                   ),
-                  const Text(
-                    'Şikayet Et',
+                  Text(
+                    'report'.tr(),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors.white),
@@ -146,8 +149,9 @@ class _ReportViewState extends State<ReportView>
                       child: TextFormField(
                         controller: _telefonController,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Şikayet edilecek numarayı giriniz',
+                        decoration: InputDecoration(
+                          labelText:
+                              'number_complain'.tr(), //Şikayet edilecek numara
                         ),
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
@@ -182,13 +186,13 @@ class _ReportViewState extends State<ReportView>
                       child: TextFormField(
                         controller: _konuController,
                         maxLength: 30,
-                        decoration: const InputDecoration(
-                          labelText: 'Şikayet konusu',
+                        decoration: InputDecoration(
+                          labelText: 'complaint_subject'.tr(), //Şikayet konusu
                           counterText: '',
                         ),
                         validator: (deger) {
                           if (deger == null || deger.isEmpty) {
-                            return 'Şikayet konusu zorunludur';
+                            return 'complaint_subject_warning'.tr();
                           }
                           return null;
                         },
@@ -204,13 +208,13 @@ class _ReportViewState extends State<ReportView>
                         controller: _sikayetController,
                         maxLines: 5,
                         maxLength: 150,
-                        decoration: const InputDecoration(
-                          labelText: 'Açıklamayı Yazın...',
+                        decoration: InputDecoration(
+                          labelText: 'write_explanation'.tr(), //Açıklamayı yaz
                           counterText: '',
                         ),
                         validator: (deger) {
                           if (deger == null || deger.isEmpty) {
-                            return 'Şikayet açıklaması zorunludur';
+                            return 'explanation_warning'.tr();
                           }
                           return null;
                         },
@@ -230,9 +234,9 @@ class _ReportViewState extends State<ReportView>
                       ),
                       elevation: 5,
                     ),
-                    child: const Text(
-                      'Gönder',
-                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    child: Text(
+                      'send'.tr(),
+                      style: const TextStyle(color: Colors.white, fontSize: 18),
                     ),
                   ),
                 ],

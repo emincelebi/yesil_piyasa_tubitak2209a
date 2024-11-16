@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart'; // Import the easy_localization package
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,7 +26,6 @@ class _WelcomeViewState extends State<WelcomeView>
   final _formKeyLogin = GlobalKey<FormState>();
   final _formKeySignup = GlobalKey<FormState>();
 
-  // Define the controllers for email and password fields
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
@@ -57,8 +57,9 @@ class _WelcomeViewState extends State<WelcomeView>
   signUpEmailAndPassword(String email, String password, MyUser myUser) async {
     final userModel = Provider.of<UserModel>(context, listen: false);
     try {
-      if (_formKeyLogin.currentState != null)
+      if (_formKeyLogin.currentState != null) {
         _formKeyLogin.currentState!.save();
+      }
       MyUser? user = await userModel.createUserWithEmailAndPassword(
           email, password, myUser);
       if (user != null && mounted) {
@@ -73,8 +74,9 @@ class _WelcomeViewState extends State<WelcomeView>
   signInEmailAndPassword(String email, String password) async {
     final userModel = Provider.of<UserModel>(context, listen: false);
     try {
-      if (_formKeySignup.currentState != null)
+      if (_formKeySignup.currentState != null) {
         _formKeySignup.currentState!.save();
+      }
       MyUser? user =
           await userModel.signInWithEmailAndPassword(email, password);
       if (user != null && mounted) {
@@ -121,14 +123,15 @@ class _WelcomeViewState extends State<WelcomeView>
                   ),
                   TabBar(
                     controller: _tabController,
-                    tabs: const [
+                    tabs: [
                       Tab(
-                        text: "Giriş Yap",
-                        icon: Icon(Icons.login, color: Colors.white),
+                        text: "login".tr(), // Use localization key here
+                        icon: const Icon(Icons.login, color: Colors.white),
                       ),
                       Tab(
-                        text: "Kayıt Ol",
-                        icon: Icon(Icons.app_registration, color: Colors.white),
+                        text: "signup".tr(), // Use localization key here
+                        icon: const Icon(Icons.app_registration,
+                            color: Colors.white),
                       ),
                     ],
                     labelColor: Colors.white,
@@ -168,33 +171,35 @@ class _WelcomeViewState extends State<WelcomeView>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             WelcomeTextField(
-              hintText: 'E-posta Adresiniz...',
+              hintText: "enter_email".tr(), // Use localization key for hint
               icon: Icons.email,
               keyboardType: TextInputType.emailAddress,
               controller: _emailController,
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Lütfen e-posta adresinizi girin';
+                  return 'email_error'
+                      .tr(); // Use localization for validation error
                 }
                 return null;
               },
             ),
             const SizedBox(height: 10),
             WelcomeTextField(
-              hintText: 'Şifreniz...',
+              hintText: "enter_password".tr(), // Use localization key for hint
               icon: Icons.lock,
-              obscureText: true, // Şifre alanı olarak ayarlanır
+              obscureText: true,
               controller: _passwordController,
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Lütfen şifrenizi girin';
+                  return 'password_error'
+                      .tr(); // Use localization for validation error
                 }
                 return null;
               },
             ),
             const SizedBox(height: 20),
             WelcomeButton(
-              text: 'Giriş Yap',
+              text: "sign_in".tr(), // Use localization key for button text
               onPressed: () {
                 if (_formKeyLogin.currentState?.validate() ?? false) {
                   signInEmailAndPassword(
@@ -205,11 +210,12 @@ class _WelcomeViewState extends State<WelcomeView>
             const SizedBox(height: 10),
             TextButton(
               onPressed: () {
-                // Şifrenizi mi unuttunuz işlemi
+                // Handle forgotten password logic here
               },
-              child: const Text(
-                'Şifrenizi mi unuttunuz?',
-                style: TextStyle(color: Colors.white),
+              child: Text(
+                "forgot_password"
+                    .tr(), // Use localization key for forgot password text
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ],
@@ -228,95 +234,91 @@ class _WelcomeViewState extends State<WelcomeView>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               WelcomeTextField(
-                hintText: 'Adınız...',
+                hintText: "enter_name".tr(), // Use localization for hint text
                 icon: Icons.person,
                 controller: nameController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Lütfen adınızı girin';
+                    return 'name_error'
+                        .tr(); // Use localization for validation error
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 10),
               WelcomeTextField(
-                hintText: 'Soyadınız...',
+                hintText:
+                    "enter_surname".tr(), // Use localization for hint text
                 icon: Icons.person_outline,
                 controller: surNameController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Lütfen soyadınızı girin';
+                    return 'surname_error'
+                        .tr(); // Use localization for validation error
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 10),
               WelcomeTextField(
-                hintText: 'E-posta Adresiniz...',
+                hintText: "enter_email".tr(), // Use localization for hint text
                 icon: Icons.email,
                 keyboardType: TextInputType.emailAddress,
                 controller: _emailController,
                 validator: ValidateCheck().validateEmail,
               ),
               const SizedBox(height: 10),
-              // Şifre alanını WelcomeTextField ile değiştirdik
               WelcomeTextField(
-                hintText: 'Şifreniz...',
+                hintText:
+                    "enter_password".tr(), // Use localization for hint text
                 icon: Icons.lock,
-                obscureText: true, // Şifre alanı olduğu için true
+                obscureText: true,
                 controller: _passwordController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Lütfen şifrenizi girin';
+                    return 'password_error'
+                        .tr(); // Use localization for validation error
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 10),
               WelcomeTextField(
-                hintText: 'Konumunuz...',
+                hintText:
+                    "enter_location".tr(), // Use localization for hint text
                 icon: Icons.location_on,
                 controller: locationController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Lütfen konumunuzu girin';
+                    return 'location_error'
+                        .tr(); // Use localization for validation error
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 10),
               WelcomeTextField(
-                hintText: 'Numaranız...',
+                hintText: "enter_phone".tr(), // Use localization for hint text
                 icon: Icons.phone,
                 keyboardType: TextInputType.phone,
                 controller: phoneController,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly
-                ], // Sadece rakam
-                onChanged: (value) {
-                  if (value.length > 11) {
-                    phoneController.text = value.substring(
-                        0, 11); // 11 karakteri aştığında, fazla karakteri kes
-                    phoneController.selection = TextSelection.fromPosition(
-                        const TextPosition(offset: 11)); // Cursor'ı sona koy
-                  }
-                },
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Lütfen numaranızı girin';
+                    return 'phone_error'
+                        .tr(); // Use localization for validation error
                   }
                   if (value.length != 10 && value.length != 11) {
-                    return 'Numara 10 veya 11 haneli olmalıdır';
+                    return 'phone_length_error'.tr(); // Localization for error
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 20),
               WelcomeButton(
-                text: 'Kayıt Ol',
+                text: "register".tr(), // Use localization for button text
                 onPressed: () {
                   if (_formKeySignup.currentState?.validate() ?? false) {
-                    // Kayıt işlemi
                     signUpEmailAndPassword(
                       _emailController.text,
                       _passwordController.text,
