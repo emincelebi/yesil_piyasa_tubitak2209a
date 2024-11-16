@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -88,7 +89,7 @@ class _ProfileViewState extends State<ProfileView> {
                 ? TextInputType.phone // Telefon numarası için sayısal klavye
                 : TextInputType.emailAddress, // E-posta için e-posta klavyesi
             decoration: InputDecoration(
-              hintText: 'Enter your $title',
+              hintText: '${tr('enter')} $title',
               hintStyle: TextStyle(color: Colors.green.shade300),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -107,15 +108,15 @@ class _ProfileViewState extends State<ProfileView> {
                 : null,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return '$title boş bırakılamaz';
+                return tr('empty_field_error', args: [title]);
               }
               if (field == 'email' &&
                   !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                return 'Geçerli bir e-posta adresi girin';
+                return tr('invalid_email_error');
               }
               if (field == 'phoneNumber' &&
                   (value.length < 10 || value.length > 11)) {
-                return 'Telefon numarası 10 veya 11 rakam olmalı';
+                return tr('invalid_phone_error');
               }
               return null;
             },
@@ -124,12 +125,11 @@ class _ProfileViewState extends State<ProfileView> {
         actions: [
           TextButton(
             onPressed: () {
-              // Önceki değeri geri yüklüyoruz
-              controller.text = previousValue;
+              controller.text = previousValue; // Önceki değeri geri yükle
               Navigator.pop(context);
             },
             child: Text(
-              'Cancel',
+              tr('cancel'),
               style: TextStyle(color: Colors.green.shade600),
             ),
           ),
@@ -143,12 +143,13 @@ class _ProfileViewState extends State<ProfileView> {
             onPressed: () async {
               if (_formKey.currentState?.validate() == true) {
                 await _updateUserData(field, controller.text);
+                // ignore: use_build_context_synchronously
                 Navigator.pop(context);
               }
             },
-            child: const Text(
-              'Save',
-              style: TextStyle(color: Colors.white),
+            child: Text(
+              tr('save'),
+              style: const TextStyle(color: Colors.white),
             ),
           ),
         ],
@@ -162,9 +163,9 @@ class _ProfileViewState extends State<ProfileView> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.green,
-        title: const Text(
-          'Profil',
-          style: TextStyle(
+        title: Text(
+          tr('profile'),
+          style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
@@ -209,7 +210,7 @@ class _ProfileViewState extends State<ProfileView> {
                                 ListTile(
                                   leading: const Icon(Icons.camera,
                                       color: Colors.green),
-                                  title: const Text('Fotoğraf Çek'),
+                                  title: Text(tr('take_photo')),
                                   onTap: () {
                                     takeAPhoto();
                                   },
@@ -217,7 +218,7 @@ class _ProfileViewState extends State<ProfileView> {
                                 ListTile(
                                   leading: const Icon(Icons.image,
                                       color: Colors.green),
-                                  title: const Text('Galeriden Seç'),
+                                  title: Text(tr('select_from_gallery')),
                                   onTap: () {
                                     selectTheGallery();
                                   },
@@ -312,7 +313,12 @@ class _ProfileViewState extends State<ProfileView> {
         onPressed: field == 'email'
             ? null
             : () {
-                _showEditDialog(context, title, controller, field);
+                _showEditDialog(
+                  context,
+                  tr(field), // Örn. "phone_number"
+                  controller,
+                  field,
+                );
               },
         icon: const Icon(Icons.edit, color: Colors.green),
       ),
@@ -353,8 +359,9 @@ class _ProfileViewState extends State<ProfileView> {
               builder: (context) {
                 profilePhoto = null;
                 return MyAlertDialog(
-                    title: 'Photo could not be saved',
-                    contentText: 'Try Again');
+                  title: tr('photo_could_not_save'),
+                  contentText: tr('try_again'),
+                );
               },
             );
           } else {
@@ -362,7 +369,7 @@ class _ProfileViewState extends State<ProfileView> {
               context: context,
               builder: (context) {
                 return MyAlertDialog(
-                    title: 'Photo saved', contentText: 'You can leave');
+                    title: tr('photo_saved'), contentText: tr('you_can_leave'));
               },
             );
           }
@@ -375,9 +382,10 @@ class _ProfileViewState extends State<ProfileView> {
           showDialog(
             context: context,
             builder: (context) {
-              profilePhoto = null;
               return MyAlertDialog(
-                  title: 'Error', contentText: 'An error occurred: $e');
+                title: tr('error'),
+                contentText: tr('an_error_occurred', args: [e.toString()]),
+              );
             },
           );
         }

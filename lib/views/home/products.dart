@@ -14,7 +14,7 @@ class _ProductsViewState extends State<ProductsView> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [Icon(Icons.home, size: 100), Text('ANA SAYFA')],
+          children: [Icon(Icons.home, size: 100)],
         ),
       ),
     );

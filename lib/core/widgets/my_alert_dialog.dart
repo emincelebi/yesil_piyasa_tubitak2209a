@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
@@ -29,9 +30,9 @@ class _MyAlertDialogState extends State<MyAlertDialog> {
             Navigator.of(context).pop();
           },
           child: widget.actions ??
-              const Text(
-                'Exit',
-                style: TextStyle(color: Colors.red),
+              Text(
+                'exit'.tr(),
+                style: const TextStyle(color: Colors.red),
               ),
         ),
       ],

@@ -14,7 +14,7 @@ class _MyProductsViewState extends State<MyProductsView> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [Icon(Icons.list, size: 100), Text('ÜRÜNLERİM')],
+          children: [Icon(Icons.list, size: 100)],
         ),
       ),
     );

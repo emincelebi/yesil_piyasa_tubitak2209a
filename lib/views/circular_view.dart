@@ -1,11 +1,13 @@
 import 'dart:ui';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class CircularView extends StatefulWidget {
   const CircularView({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CircularViewState createState() => _CircularViewState();
 }
 
@@ -59,9 +61,9 @@ class _CircularViewState extends State<CircularView>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'Yükleniyor, lütfen bekleyin...',
-                  style: TextStyle(
+                Text(
+                  'loading'.tr(),
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,

@@ -14,7 +14,7 @@ class _AddProductsViewState extends State<AddProductsView> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [Icon(Icons.add_circle, size: 100), Text('ÜRÜN EKLE')],
+          children: [Icon(Icons.add_circle, size: 100)],
         ),
       ),
     );

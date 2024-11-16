@@ -1,14 +1,16 @@
+import 'package:easy_localization/easy_localization.dart';
+
 class ErrorHandling {
   static String translateErrorMessage(String errorCode) {
     switch (errorCode) {
       case 'invalid-credential':
-        return 'Kullanıcı bulunamadı. Lütfen bilgilerinizi kontrol edin.';
+        return 'firebase_invalid_credential'.tr();
       case 'email-already-in-use':
-        return 'Bu e-posta zaten kullanımda. Farklı bir e-posta deneyin.';
+        return 'firebase_email_already_in_use'.tr();
       case 'network-request-failed':
-        return 'İnternet bağlantısı hatası. Lütfen bağlantınızı kontrol edin.';
+        return 'firebase_network_request_failed'.tr();
       default:
-        return 'Bir hata oluştu. Lütfen tekrar deneyin.';
+        return 'firebase_custom_error'.tr();
     }
   }
 }

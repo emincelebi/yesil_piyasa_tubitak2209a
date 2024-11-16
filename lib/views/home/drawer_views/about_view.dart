@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:easy_localization/easy_localization.dart'; // Import easy_localization
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -17,11 +18,10 @@ class _AboutViewState extends State<AboutView>
   @override
   void initState() {
     super.initState();
-    // Animasyon denetleyicisi başlatılıyor
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 6),
-    )..repeat(); // Animasyonu sürekli tekrar ettiriyoruz
+    )..repeat();
   }
 
   @override
@@ -41,10 +41,9 @@ class _AboutViewState extends State<AboutView>
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      extendBodyBehindAppBar: true, // Arka planı appbar ile birleştirir
+      extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          // Arka plan resmi
           Positioned.fill(
             child: Image.asset(
               'assets/images/background.png',
@@ -53,8 +52,6 @@ class _AboutViewState extends State<AboutView>
               colorBlendMode: BlendMode.darken,
             ),
           ),
-
-          // İçerik kısmı
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -63,19 +60,14 @@ class _AboutViewState extends State<AboutView>
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(
-                        height: 100), // Logoyu biraz daha aşağıya çektik
-
-                    // Animasyonlu Logo
+                    const SizedBox(height: 100),
                     AnimatedBuilder(
                       animation: _animationController,
                       builder: (context, child) {
                         return Transform(
                           alignment: Alignment.center,
                           transform: Matrix4.identity()
-                            ..rotateY(_animationController.value *
-                                2 *
-                                pi), // Y ekseninde 3D dönüş
+                            ..rotateY(_animationController.value * 2 * pi),
                           child: child,
                         );
                       },
@@ -87,10 +79,8 @@ class _AboutViewState extends State<AboutView>
                       ),
                     ),
                     const SizedBox(height: 30),
-
-                    // Hakkımızda Kartı
                     _buildCard(
-                      title: 'HAKKIMIZDA',
+                      title: 'about.title'.tr(), // Use localization
                       content:
                           'Yeşil Piyasa, tarım dünyasına dijital bir soluk getiren bir mobil uygulamadır. Çiftçilerin emeğini değerli kılarken, tüketicilere taze ve doğal ürünlere kolay erişim sunar.\n\n'
                           'Bu platform, yerel ekonomiyi güçlendirmeyi hedefler; çiftçilerin ürünlerini doğrudan pazarlayabilmesini sağlarken, sağlıklı gıda alışverişini daha kolay ve güvenli hale getirir.\n\n'
@@ -98,10 +88,8 @@ class _AboutViewState extends State<AboutView>
                       context: context,
                     ),
                     const SizedBox(height: 20),
-
-                    // Misyonumuz Kartı
                     _buildCard(
-                      title: 'MİSYONUMUZ',
+                      title: 'mission.title'.tr(), // Use localization
                       content:
                           'Çiftçilere emeğinin karşılığını alabileceği, sürdürülebilir ve kazançlı bir pazar alanı sunmak en büyük amacımızdır.\n\n'
                           'Tüketicilere ise taze ve doğal ürünlere ulaşmanın kolay ve güvenli yollarını sağlıyoruz. Yerel tarım ekonomisini güçlendirmeye odaklanan Yeşil Piyasa, çiftçilerle alıcılar arasında doğrudan bir köprü kurar ve tarımı dijitalleştirerek modernize eder.\n\n'
@@ -109,10 +97,8 @@ class _AboutViewState extends State<AboutView>
                       context: context,
                     ),
                     const SizedBox(height: 20),
-
-                    // İletişim Kartı
                     _buildContactCard(context),
-                    const SizedBox(height: 10), // Ekstra boşluk
+                    const SizedBox(height: 10),
                   ],
                 ),
               ),
@@ -123,7 +109,6 @@ class _AboutViewState extends State<AboutView>
     );
   }
 
-  // Kart yapısı (Başlık ve içerik ile birlikte)
   Widget _buildCard(
       {required String title,
       required String content,
@@ -168,11 +153,10 @@ class _AboutViewState extends State<AboutView>
     );
   }
 
-  // İletişim kartı
   Widget _buildContactCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16.0),
-      margin: const EdgeInsets.only(bottom: 20.0), // Dinamik boşluk
+      margin: const EdgeInsets.only(bottom: 20.0),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.8),
         borderRadius: BorderRadius.circular(12.0),
@@ -188,7 +172,7 @@ class _AboutViewState extends State<AboutView>
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            'İLETİŞİM',
+            'contact.title'.tr(), // Use localization
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: MediaQuery.of(context).size.width * 0.06,
@@ -202,14 +186,14 @@ class _AboutViewState extends State<AboutView>
               Expanded(
                 child: _buildContactItem(
                   icon: Icons.phone,
-                  text: '0551-553-1541',
+                  text: 'phone_1'.tr(), // Use localization
                   onTap: () => _launchUrl('tel:05515531541'),
                 ),
               ),
               Expanded(
                 child: _buildContactItem(
                   icon: Icons.phone,
-                  text: '0505-422-9003',
+                  text: 'phone_2'.tr(), // Use localization
                   onTap: () => _launchUrl('tel:05054229003'),
                 ),
               ),
@@ -218,7 +202,7 @@ class _AboutViewState extends State<AboutView>
           const Divider(),
           _buildContactItem(
             icon: Icons.email,
-            text: 'piyasayesil@gmail.com',
+            text: 'email_yesil_piyasa'.tr(), // Use localization
             onTap: () => _launchUrl(
                 'mailto:piyasayesil@gmail.com?subject=İletişim&body=Merhaba%20Yeşil%20Piyasa%20Ekibi'),
           ),
@@ -228,7 +212,7 @@ class _AboutViewState extends State<AboutView>
               Expanded(
                 child: _buildContactItem(
                   icon: Icons.link,
-                  text: 'Emin Çelebi',
+                  text: 'linkedin_emin'.tr(), // Use localization
                   onTap: () =>
                       _launchUrl('https://www.linkedin.com/in/emincelebi/'),
                 ),
@@ -236,9 +220,9 @@ class _AboutViewState extends State<AboutView>
               Expanded(
                 child: _buildContactItem(
                   icon: Icons.link,
-                  text: 'Mustafa Kıraç',
+                  text: 'linkedin_mustafa'.tr(), // Use localization
                   onTap: () => _launchUrl(
-                      'https://www.linkedin.com/in/mustafa-k%C4%B1ra%C3%A7-1790b31bb/'),
+                      'https://www.linkedin.com/in/mustafa-kıraç-1790b31bb/'),
                 ),
               ),
             ],
@@ -248,7 +232,6 @@ class _AboutViewState extends State<AboutView>
     );
   }
 
-  // İletişim bilgileri için tekrar kullanılabilir widget
   Widget _buildContactItem({
     required IconData icon,
     required String text,
