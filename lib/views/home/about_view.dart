@@ -197,10 +197,23 @@ class _AboutViewState extends State<AboutView>
             ),
           ),
           const SizedBox(height: 10),
-          _buildContactItem(
-            icon: Icons.phone,
-            text: '0505-422-9003',
-            onTap: () => _launchUrl('tel:05054229003'),
+          Row(
+            children: [
+              Expanded(
+                child: _buildContactItem(
+                  icon: Icons.phone,
+                  text: '0551-553-1541',
+                  onTap: () => _launchUrl('tel:05515531541'),
+                ),
+              ),
+              Expanded(
+                child: _buildContactItem(
+                  icon: Icons.phone,
+                  text: '0505-422-9003',
+                  onTap: () => _launchUrl('tel:05054229003'),
+                ),
+              ),
+            ],
           ),
           const Divider(),
           _buildContactItem(
@@ -210,11 +223,25 @@ class _AboutViewState extends State<AboutView>
                 'mailto:piyasayesil@gmail.com?subject=İletişim&body=Merhaba%20Yeşil%20Piyasa%20Ekibi'),
           ),
           const Divider(),
-          _buildContactItem(
-            icon: Icons.link,
-            text: 'LinkedIn',
-            onTap: () => _launchUrl(
-                'https://www.linkedin.com/in/mustafa-k%C4%B1ra%C3%A7-1790b31bb/'),
+          Row(
+            children: [
+              Expanded(
+                child: _buildContactItem(
+                  icon: Icons.link,
+                  text: 'Emin Çelebi',
+                  onTap: () =>
+                      _launchUrl('https://www.linkedin.com/in/emincelebi/'),
+                ),
+              ),
+              Expanded(
+                child: _buildContactItem(
+                  icon: Icons.link,
+                  text: 'Mustafa Kıraç',
+                  onTap: () => _launchUrl(
+                      'https://www.linkedin.com/in/mustafa-k%C4%B1ra%C3%A7-1790b31bb/'),
+                ),
+              ),
+            ],
           ),
         ],
       ),
