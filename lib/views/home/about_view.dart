@@ -1,17 +1,33 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class AboutView extends StatelessWidget {
+class AboutView extends StatefulWidget {
   const AboutView({super.key});
 
-  // Sosyal medya ve iletişim bağlantılarına yönlendirme
-  Future<void> _launchUrl(String url) async {
-    final Uri uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
-      throw 'Could not launch $url';
-    }
+  @override
+  State<AboutView> createState() => _AboutViewState();
+}
+
+class _AboutViewState extends State<AboutView>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Animasyon denetleyicisi başlatılıyor
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 6),
+    )..repeat(); // Animasyonu sürekli tekrar ettiriyoruz
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -50,21 +66,24 @@ class AboutView extends StatelessWidget {
                     const SizedBox(
                         height: 100), // Logoyu biraz daha aşağıya çektik
 
-                    // Logo
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.5),
-                            blurRadius: 15,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: const CircleAvatar(
-                        radius: 60,
-                        backgroundImage: AssetImage('assets/images/logo.png'),
+                    // Animasyonlu Logo
+                    AnimatedBuilder(
+                      animation: _animationController,
+                      builder: (context, child) {
+                        return Transform(
+                          alignment: Alignment.center,
+                          transform: Matrix4.identity()
+                            ..rotateY(_animationController.value *
+                                2 *
+                                pi), // Y ekseninde 3D dönüş
+                          child: child,
+                        );
+                      },
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.contain,
                       ),
                     ),
                     const SizedBox(height: 30),
@@ -73,8 +92,8 @@ class AboutView extends StatelessWidget {
                     _buildCard(
                       title: 'HAKKIMIZDA',
                       content:
-                          'Yeşil Piyasa, tarım dünyasına dijital bir soluk getiren bir mobil uygulamadır. Çiftçilerin emeğini değerli kılarken, tüketicilere taze, doğal ürünlere kolay erişim sunar. \n\n'
-                          'Bu platform, yerel ekonomiyi güçlendirmeyi hedefler; çiftçilerin ürünlerini doğrudan pazarlayabilmesini sağlarken, sağlıklı gıda alışverişini her zamankinden daha kolay ve güvenli hale getirir. \n\n'
+                          'Yeşil Piyasa, tarım dünyasına dijital bir soluk getiren bir mobil uygulamadır. Çiftçilerin emeğini değerli kılarken, tüketicilere taze ve doğal ürünlere kolay erişim sunar.\n\n'
+                          'Bu platform, yerel ekonomiyi güçlendirmeyi hedefler; çiftçilerin ürünlerini doğrudan pazarlayabilmesini sağlarken, sağlıklı gıda alışverişini daha kolay ve güvenli hale getirir.\n\n'
                           'Yeşil Piyasa, tarımın geleceğini dijital dünyada şekillendirerek, hem çiftçilere hem de tüketicilere fayda sağlamayı amaçlar.',
                       context: context,
                     ),
@@ -84,8 +103,8 @@ class AboutView extends StatelessWidget {
                     _buildCard(
                       title: 'MİSYONUMUZ',
                       content:
-                          'Çiftçilere emeğinin karşılığını alabileceği, sürdürülebilir ve kazançlı bir pazar alanı sunmak en büyük amacımızdır. \n\n'
-                          'Tüketicilere ise taze, doğal ürünlere ulaşmanın kolay ve güvenli yollarını sağlıyoruz. Yerel tarım ekonomisini güçlendirmeye odaklanan Yeşil Piyasa, çiftçilerle alıcılar arasında doğrudan bir köprü kurar ve tarımı dijitalleştirerek modernize eder. \n\n'
+                          'Çiftçilere emeğinin karşılığını alabileceği, sürdürülebilir ve kazançlı bir pazar alanı sunmak en büyük amacımızdır.\n\n'
+                          'Tüketicilere ise taze ve doğal ürünlere ulaşmanın kolay ve güvenli yollarını sağlıyoruz. Yerel tarım ekonomisini güçlendirmeye odaklanan Yeşil Piyasa, çiftçilerle alıcılar arasında doğrudan bir köprü kurar ve tarımı dijitalleştirerek modernize eder.\n\n'
                           'Her bir ürünün arkasındaki emeğe saygı gösteriyor, sağlıklı beslenmeyi destekliyor ve yerel ekonomilere katkıda bulunuyoruz.',
                       context: context,
                     ),
@@ -93,6 +112,7 @@ class AboutView extends StatelessWidget {
 
                     // İletişim Kartı
                     _buildContactCard(context),
+                    const SizedBox(height: 10), // Ekstra boşluk
                   ],
                 ),
               ),
@@ -152,6 +172,7 @@ class AboutView extends StatelessWidget {
   Widget _buildContactCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16.0),
+      margin: const EdgeInsets.only(bottom: 20.0), // Dinamik boşluk
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.8),
         borderRadius: BorderRadius.circular(12.0),
@@ -185,7 +206,8 @@ class AboutView extends StatelessWidget {
           _buildContactItem(
             icon: Icons.email,
             text: 'piyasayesil@gmail.com',
-            onTap: () => _launchUrl('mailto:piyasayesil@gmail.com'),
+            onTap: () => _launchUrl(
+                'mailto:piyasayesil@gmail.com?subject=İletişim&body=Merhaba%20Yeşil%20Piyasa%20Ekibi'),
           ),
           const Divider(),
           _buildContactItem(
@@ -223,5 +245,14 @@ class AboutView extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _launchUrl(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }
