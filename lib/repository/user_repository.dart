@@ -109,22 +109,51 @@ class UserRepository implements AuthBase {
     }
   }
 
+  /// Ürün ekleme
   Future<bool> addProduct(Product product) async {
     try {
-      await _fireStoreDbService.saveProduct(product);
+      await _fireStoreDbService.addProduct(product);
       return true;
     } catch (e) {
       return false;
     }
   }
 
-  // Ürün güncelleme
+  /// Ürün güncelleme
   Future<bool> updateProduct(Product product) async {
     try {
       await _fireStoreDbService.updateProduct(product);
       return true;
     } catch (e) {
       return false;
+    }
+  }
+
+  /// Ürün silme
+  Future<bool> deleteProduct(String productID, String userID) async {
+    try {
+      await _fireStoreDbService.deleteProduct(productID, userID);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Tüm ürünleri getir
+  Future<List<Product>> fetchAllProducts() async {
+    try {
+      return await _fireStoreDbService.fetchAllProducts();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  /// Kullanıcının ürünlerini getir
+  Future<List<Product>> fetchMyProducts(String userID) async {
+    try {
+      return await _fireStoreDbService.fetchMyProducts(userID);
+    } catch (e) {
+      return [];
     }
   }
 }

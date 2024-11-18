@@ -72,8 +72,41 @@ class FireStoreDBService implements DbBase {
     return true;
   }
 
-  Future<void> saveProduct(Product product) async {
-    await _firebaseDB.collection("products").add(product.toJson());
+  Future<void> addProduct(Product product) async {
+    try {
+      // Firestore'da ürün koleksiyonuna yeni bir belge referansı oluştur
+      final productRef =
+          FirebaseFirestore.instance.collection('products').doc();
+
+      // Otomatik oluşturulan ID
+      String productId = productRef.id;
+
+      // Ürünü Firestore'a kaydet
+      await productRef.set({
+        'productID': productId, // Otomatik ID'yi productID olarak kaydet
+        'name': product.name,
+        'userID': product.userID,
+        'description': product.description,
+        'price': product.price,
+        'unit': product.unit,
+        'stock': product.stock,
+        'imageUrl': product.imageUrl,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      // Kullanıcıya ait ürünler listesine bu yeni ürünü ekle
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(product.userID)
+          .update({
+        'products': FieldValue.arrayUnion([productId]),
+      });
+
+      print('Product added with ID: $productId');
+    } catch (e) {
+      print('Error adding product: $e');
+    }
   }
 
   // Ürün güncelleme
@@ -82,5 +115,64 @@ class FireStoreDBService implements DbBase {
         .collection("products")
         .doc(product.productID) // Ürün ID'sine göre güncelleme yapıyoruz
         .update(product.toJson());
+  }
+
+  // Ürün silme
+  Future<void> deleteProduct(String productID, String userID) async {
+    try {
+      // Kullanıcıyı getir
+      DocumentSnapshot<Map<String, dynamic>> userDoc =
+          await _firebaseDB.collection("users").doc(userID).get();
+
+      if (userDoc.exists) {
+        // Kullanıcının ürün listesinden ürünü kaldır
+        List<String>? products =
+            List<String>.from(userDoc.data()?['products'] ?? []);
+        products.remove(productID);
+
+        await _firebaseDB
+            .collection("users")
+            .doc(userID)
+            .update({'products': products});
+      }
+
+      // Ürünü Firestore'dan sil
+      await _firebaseDB.collection("products").doc(productID).delete();
+    } catch (e) {
+      if (kDebugMode) {
+        print("Ürün silinirken hata oluştu: $e");
+      }
+      rethrow;
+    }
+  }
+
+// Tüm ürünleri getir
+  Future<List<Product>> fetchAllProducts() async {
+    QuerySnapshot<Map<String, dynamic>> snapshot =
+        await _firebaseDB.collection("products").get();
+
+    List<Product> products = snapshot.docs.map((doc) {
+      Map<String, dynamic> data = doc.data();
+      return Product.fromJson(data..['productID'] = doc.id);
+    }).toList();
+
+    return products;
+  }
+
+// Kullanıcıya ait ürünleri getir
+  Future<List<Product>> fetchMyProducts(String userID) async {
+    // Belirtilen kullanıcının ürünlerini getir
+    QuerySnapshot<Map<String, dynamic>> snapshot = await _firebaseDB
+        .collection("products")
+        .where("userID", isEqualTo: userID)
+        .get();
+
+    // Ürün listesini döndür
+    List<Product> products = snapshot.docs.map((doc) {
+      Map<String, dynamic> data = doc.data();
+      return Product.fromJson(data..['productID'] = doc.id);
+    }).toList();
+
+    return products;
   }
 }

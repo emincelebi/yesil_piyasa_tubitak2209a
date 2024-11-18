@@ -124,24 +124,66 @@ class UserModel with ChangeNotifier implements AuthBase {
     notifyListeners();
 
     try {
-      // Firestore'a veri gönder
-      bool success = await _userRepository.addProduct(product);
+      await _userRepository.addProduct(product);
     } finally {
       _state = ViewState.Idle;
     }
     notifyListeners();
   }
 
-  // Ürün güncelleme işlemi
   Future<void> updateProduct(Product product) async {
     _state = ViewState.Busy;
     notifyListeners();
 
     try {
-      bool success = await _userRepository.updateProduct(product);
+      await _userRepository.updateProduct(product);
     } finally {
       _state = ViewState.Idle;
     }
     notifyListeners();
+  }
+
+  /// Ürün silme işlemi
+  Future<void> deleteProduct(String productID, String userID) async {
+    _state = ViewState.Busy;
+    notifyListeners();
+
+    try {
+      await _userRepository.deleteProduct(productID, userID);
+    } finally {
+      _state = ViewState.Idle;
+    }
+    notifyListeners();
+  }
+
+  /// Tüm ürünleri getir
+  Future<List<Product>> fetchAllProducts() async {
+    _state = ViewState.Busy;
+    notifyListeners();
+
+    List<Product> products = [];
+    try {
+      products = await _userRepository.fetchAllProducts();
+    } finally {
+      _state = ViewState.Idle;
+    }
+    notifyListeners();
+    return products;
+  }
+
+  /// Kullanıcının ürünlerini getir
+  Future<List<Product>> fetchMyProducts() async {
+    if (_user == null) return [];
+    _state = ViewState.Busy;
+    notifyListeners();
+
+    List<Product> products = [];
+    try {
+      products = await _userRepository.fetchMyProducts(_user!.userID);
+    } finally {
+      _state = ViewState.Idle;
+    }
+    notifyListeners();
+    return products;
   }
 }

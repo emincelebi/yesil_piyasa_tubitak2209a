@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Product {
   final String productID; // Ürün ID'si
   final String name; // Ürün ismi
+  final String userID; // Ürünü ekleyen kullanıcının ID'si
   String? description; // Ürün açıklaması
   double price; // Ürün fiyatı
   String unit; // Fiyat birimi (ör. kg, adet)
@@ -14,6 +15,7 @@ class Product {
   Product({
     required this.productID,
     required this.name,
+    required this.userID,
     required this.price,
     required this.unit,
     required this.stock,
@@ -27,6 +29,7 @@ class Product {
     return Product(
       productID: json['productID'],
       name: json['name'],
+      userID: json['userID'],
       description: json['description'],
       price: json['price'].toDouble(),
       unit: json['unit'],
@@ -41,6 +44,7 @@ class Product {
     return {
       'productID': productID,
       'name': name,
+      'userID': userID,
       'description': description,
       'price': price,
       'unit': unit,
