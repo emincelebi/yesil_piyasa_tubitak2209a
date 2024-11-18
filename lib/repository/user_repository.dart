@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:yesil_piyasa/locator.dart';
 import 'package:yesil_piyasa/model/my_user.dart';
+import 'package:yesil_piyasa/model/product.dart';
 import 'package:yesil_piyasa/services/auth_base.dart';
 import 'package:yesil_piyasa/services/fake_auth_service.dart';
 import 'package:yesil_piyasa/services/firebase_auth_service.dart';
@@ -105,6 +106,25 @@ class UserRepository implements AuthBase {
           userId, fileType, uploadFile);
       await _fireStoreDbService.updateProfilePhoto(userId, profilePhotoURL);
       return profilePhotoURL;
+    }
+  }
+
+  Future<bool> addProduct(Product product) async {
+    try {
+      await _fireStoreDbService.saveProduct(product);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Ürün güncelleme
+  Future<bool> updateProduct(Product product) async {
+    try {
+      await _fireStoreDbService.updateProduct(product);
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 }

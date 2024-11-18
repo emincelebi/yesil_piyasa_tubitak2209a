@@ -1,4 +1,3 @@
-import 'package:animations/animations.dart';
 import 'package:clay_containers/widgets/clay_container.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -66,49 +65,31 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: scaffoldKey,
-      appBar: _buildAnimatedAppBar(),
-      drawer: _buildDrawer(),
-      body: Container(
-        color: _currentBackgroundColor,
-        child: PageTransitionSwitcher(
-          duration: const Duration(milliseconds: 700),
-          reverse: _currentIndex != 1,
-          transitionBuilder: (child, animation, secondaryAnimation) =>
-              FadeTransition(
-            opacity: animation,
-            child: ScaleTransition(scale: animation, child: child),
-          ),
+    return SafeArea(
+      child: Scaffold(
+        key: scaffoldKey,
+        appBar: _buildAnimatedAppBar(),
+        drawer: _buildDrawer(),
+        body: Container(
+          color: _currentBackgroundColor,
           child: _pages[_currentIndex],
         ),
+        bottomNavigationBar: _buildAnimatedBottomNavigationBar(),
       ),
-      bottomNavigationBar: _buildAnimatedBottomNavigationBar(),
     );
   }
 
   // AppBar with animation
   PreferredSizeWidget _buildAnimatedAppBar() {
     return AppBar(
+      backgroundColor: _currentIndex == 0
+          ? Colors.blue
+          : (_currentIndex == 1 ? Colors.green : Colors.orange),
       leading: IconButton(
         icon: const Icon(Icons.menu),
         onPressed: () => scaffoldKey.currentState?.openDrawer(),
       ),
       actions: [Image.asset('assets/images/logo.png')],
-      flexibleSpace: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              _currentIndex == 0
-                  ? Colors.blue
-                  : (_currentIndex == 1 ? Colors.green : Colors.orange),
-              Colors.grey
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-      ),
       title: Text(
         'Yeşil Piyasa',
         style: GoogleFonts.pacifico(
@@ -119,7 +100,6 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         ),
       ),
       centerTitle: true,
-      elevation: 12,
       shadowColor: Colors.black38,
     );
   }
@@ -230,6 +210,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                 );
                 if (true) {
                   print('Dönen değer: $result');
+                  Future.delayed(Durations.medium4);
                   setState(() {
                     // state değişikliklerini burada uygulayın.
                   });

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:yesil_piyasa/core/components/validate_check.dart';
 import 'package:yesil_piyasa/locator.dart';
 import 'package:yesil_piyasa/model/my_user.dart';
+import 'package:yesil_piyasa/model/product.dart';
 import 'package:yesil_piyasa/repository/user_repository.dart';
 import 'package:yesil_piyasa/services/auth_base.dart';
 
@@ -116,5 +117,31 @@ class UserModel with ChangeNotifier implements AuthBase {
         await _userRepository.uploadFile(userId, fileType, uploadFile);
     notifyListeners();
     return downloadLink;
+  }
+
+  Future<void> addProduct(Product product) async {
+    _state = ViewState.Busy;
+    notifyListeners();
+
+    try {
+      // Firestore'a veri gönder
+      bool success = await _userRepository.addProduct(product);
+    } finally {
+      _state = ViewState.Idle;
+    }
+    notifyListeners();
+  }
+
+  // Ürün güncelleme işlemi
+  Future<void> updateProduct(Product product) async {
+    _state = ViewState.Busy;
+    notifyListeners();
+
+    try {
+      bool success = await _userRepository.updateProduct(product);
+    } finally {
+      _state = ViewState.Idle;
+    }
+    notifyListeners();
   }
 }

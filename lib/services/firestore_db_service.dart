@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:yesil_piyasa/model/my_user.dart';
+import 'package:yesil_piyasa/model/product.dart';
 import 'package:yesil_piyasa/services/db_base.dart';
 
 class FireStoreDBService implements DbBase {
@@ -69,5 +70,17 @@ class FireStoreDBService implements DbBase {
         .doc(userId)
         .update({'proifleImageUrl': profilePhotoURL});
     return true;
+  }
+
+  Future<void> saveProduct(Product product) async {
+    await _firebaseDB.collection("products").add(product.toJson());
+  }
+
+  // Ürün güncelleme
+  Future<void> updateProduct(Product product) async {
+    await _firebaseDB
+        .collection("products")
+        .doc(product.productID) // Ürün ID'sine göre güncelleme yapıyoruz
+        .update(product.toJson());
   }
 }
