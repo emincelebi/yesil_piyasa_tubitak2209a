@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:yesil_piyasa/model/my_user.dart'; // MyUser modelini import edin
-import 'package:yesil_piyasa/model/product.dart'; // Product modelini import edin
+import 'package:provider/provider.dart';
+import 'package:yesil_piyasa/model/product.dart';
+import 'package:yesil_piyasa/viewmodel/user_model.dart';
 
 class MyProductsView extends StatefulWidget {
   const MyProductsView({super.key});
@@ -12,68 +13,42 @@ class MyProductsView extends StatefulWidget {
 }
 
 class _MyProductsViewState extends State<MyProductsView> {
-  // Kullanıcıyı Firestore'dan alacağız
-  late MyUser currentUser;
-  List<Product> products = [];
-  bool isLoading = true; // Veri çekme durumu
+  late String userID;
 
   @override
   void initState() {
     super.initState();
-    _fetchUserData(); // Kullanıcı verisini çekmeye başla
+    currentUser();
   }
 
-  // Kullanıcıyı Firestore'dan çekme
-  Future<void> _fetchUserData() async {
-    try {
-      // Kullanıcı verisini Firestore'dan alıyoruz
-      var userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(
-              'userID') // Burada 'userID' dinamik olarak kullanıcı ID'si olacak
-          .get();
-
-      if (userDoc.exists) {
-        // Kullanıcı verisini aldıktan sonra `currentUser`'ı oluşturuyoruz
-        currentUser = MyUser.fromJson(userDoc.data()!);
-
-        // Kullanıcının ürünlerini Firestore'dan alıyoruz
-        if (currentUser.products != null && currentUser.products!.isNotEmpty) {
-          _fetchProducts();
-        } else {
-          setState(() {
-            isLoading = false; // Ürün yoksa, loading durumu false olacak
-          });
-        }
-      }
-    } catch (e) {
-      print("Error fetching user data: $e");
-      setState(() {
-        isLoading = false; // Hata durumunda loading durumu false olacak
-      });
-    }
+  currentUser() {
+    final userModel = Provider.of<UserModel>(context, listen: false);
+    userID = userModel.user!.userID;
   }
 
-  // Kullanıcının ürünlerini Firestore'dan çekme
-  Future<void> _fetchProducts() async {
+  // Ürünü Firestore'dan silme ve kullanıcının ürün listesinde güncelleme işlemi
+  Future<void> deleteProduct(Product product) async {
     try {
-      var productDocs = await FirebaseFirestore.instance
+      // 1. Firestore'dan ürünü sil
+      await FirebaseFirestore.instance
           .collection('products')
-          .where('productID', whereIn: currentUser.products!)
-          .get();
+          .doc(product.productID)
+          .delete();
 
-      setState(() {
-        products = productDocs.docs.map((doc) {
-          return Product.fromJson(doc.data());
-        }).toList();
-        isLoading =
-            false; // Veri çekme tamamlandığında loading durumu false olacak
+      // 2. Kullanıcının ürünler listesinde ürünü sil
+      await FirebaseFirestore.instance.collection('users').doc(userID).update({
+        'products': FieldValue.arrayRemove([product.productID]),
       });
+
+      // Başarılı işlem sonrası bir mesaj gösterebiliriz
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('product_deleted_succesfully'.tr())),
+      );
     } catch (e) {
-      print("Error fetching products: $e");
-      setState(() {
-        isLoading = false; // Hata durumunda loading durumu false olacak
-      });
+      // Hata durumunda bir mesaj göster
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting product: $e')),
+      );
     }
   }
 
@@ -83,57 +58,86 @@ class _MyProductsViewState extends State<MyProductsView> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.blue, Colors.white],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 24),
-              // Veri yükleniyor mu kontrolü
-              isLoading
-                  ? const CircularProgressIndicator() // Yükleniyor göstergesi
-                  : products.isNotEmpty
-                      ? Expanded(
-                          child: ListView.builder(
-                            itemCount: products.length,
-                            itemBuilder: (context, index) {
-                              final product = products[index];
-                              return Card(
-                                margin: const EdgeInsets.symmetric(
-                                    vertical: 8, horizontal: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: 4,
-                                child: ListTile(
-                                  title: Text(product.name),
-                                  subtitle: Text(
-                                      product.description ?? 'No description'),
-                                  trailing: Text(
-                                      "\$${product.price.toStringAsFixed(2)} ${product.unit}"),
-                                  leading: product.imageUrl != null
-                                      ? Image.network(product.imageUrl!,
-                                          width: 50,
-                                          height: 50,
-                                          fit: BoxFit.cover)
-                                      : const Icon(Icons.image, size: 50),
-                                ),
-                              );
-                            },
-                          ),
-                        )
-                      : Text(
-                          "no_product".tr(),
-                          style: const TextStyle(
-                              fontSize: 16, color: Colors.black54),
-                        ),
+            colors: [
+              Colors.blue,
+              Colors.white,
             ],
           ),
+        ),
+        child: FutureBuilder<DocumentSnapshot>(
+          future:
+              FirebaseFirestore.instance.collection('users').doc(userID).get(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (!snapshot.hasData || snapshot.hasError) {
+              return const Center(child: Text('Error loading user data.'));
+            }
+
+            return Column(
+              children: [
+                // Kullanıcının Satışa Sundugu Ürünleri Göster
+                Expanded(
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('products')
+                        .where('userID', isEqualTo: userID)
+                        .snapshots(),
+                    builder: (context, productSnapshot) {
+                      if (productSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      if (!productSnapshot.hasData ||
+                          productSnapshot.hasError) {
+                        return Center(
+                            child: Text('error_loading_products'.tr()));
+                      }
+
+                      final products = productSnapshot.data!.docs.map((doc) {
+                        return Product.fromJson(
+                            doc.data() as Map<String, dynamic>);
+                      }).toList();
+
+                      return ListView.builder(
+                        itemCount: products.length,
+                        itemBuilder: (context, index) {
+                          final product = products[index];
+                          return Card(
+                            margin: const EdgeInsets.all(8.0),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.all(12),
+                              title: Text(product.name,
+                                  style: const TextStyle(fontSize: 18)),
+                              subtitle: Text(
+                                  '${tr('price')}: ${product.price} ${product.unit}'),
+                              leading: product.imageUrl != null
+                                  ? Image.network(product.imageUrl!,
+                                      width: 50, height: 50, fit: BoxFit.cover)
+                                  : const Icon(Icons.image, size: 50),
+                              trailing: IconButton(
+                                icon:
+                                    const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () {
+                                  // Silme işlemi
+                                  deleteProduct(product);
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

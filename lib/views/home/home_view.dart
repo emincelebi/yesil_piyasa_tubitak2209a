@@ -46,7 +46,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     Colors.orangeAccent, // Background for Add
   ];
 
-  Color _currentBackgroundColor = Colors.blueAccent;
+  Color _currentBackgroundColor = Colors.blue;
 
   @override
   void initState() {
