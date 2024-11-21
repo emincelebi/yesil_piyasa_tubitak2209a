@@ -344,10 +344,10 @@ class _AddProductsViewState extends State<AddProductsView> {
           _selectedUnit = value!;
         });
       },
-      items: const [
-        DropdownMenuItem(value: 'kg', child: Text('kg')),
-        DropdownMenuItem(value: 'piece', child: Text('piece')),
-        DropdownMenuItem(value: 'liter', child: Text('liter')),
+      items: [
+        DropdownMenuItem(value: 'kg', child: Text('kg'.tr())),
+        DropdownMenuItem(value: 'piece', child: Text('piece'.tr())),
+        DropdownMenuItem(value: 'liter', child: Text('liter'.tr())),
       ],
       decoration: InputDecoration(
         labelText: 'unit'.tr(),
