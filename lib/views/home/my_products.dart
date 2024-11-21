@@ -26,7 +26,51 @@ class _MyProductsViewState extends State<MyProductsView> {
     userID = userModel.user!.userID;
   }
 
-  // Ürünü Firestore'dan silme ve kullanıcının ürün listesinde güncelleme işlemi
+  // Overlay ile yukarıdan bildirim gösterme
+  void showTopNotification(String message, Color backgroundColor) {
+    final overlay = Overlay.of(context);
+    final overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: 50.0,
+        left: MediaQuery.of(context).size.width * 0.1,
+        width: MediaQuery.of(context).size.width * 0.8,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding:
+                const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(8.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    Future.delayed(const Duration(seconds: 3), () {
+      overlayEntry.remove();
+    });
+  }
+
   Future<void> deleteProduct(Product product) async {
     try {
       // 1. Firestore'dan ürünü sil
@@ -35,19 +79,21 @@ class _MyProductsViewState extends State<MyProductsView> {
           .doc(product.productID)
           .delete();
 
-      // 2. Kullanıcının ürünler listesinde ürünü sil
+      // 2. Kullanıcının ürünler listesinde güncelleme
       await FirebaseFirestore.instance.collection('users').doc(userID).update({
         'products': FieldValue.arrayRemove([product.productID]),
       });
 
-      // Başarılı işlem sonrası bir mesaj gösterebiliriz
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('product_deleted_succesfully'.tr())),
+      // Başarılı mesaj
+      showTopNotification(
+        tr('product_deleted_succesfully'),
+        Colors.green,
       );
     } catch (e) {
-      // Hata durumunda bir mesaj göster
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error deleting product: $e')),
+      // Hata mesajı
+      showTopNotification(
+        "${tr('error_deleting_product')}: $e",
+        Colors.red,
       );
     }
   }

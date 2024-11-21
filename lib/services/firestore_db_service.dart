@@ -91,6 +91,7 @@ class FireStoreDBService implements DbBase {
         'unit': product.unit,
         'stock': product.stock,
         'imageUrl': product.imageUrl,
+        'category': product.category,
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       });
