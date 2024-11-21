@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:yesil_piyasa/core/widgets/product_detail_page.dart';
 
@@ -21,7 +22,7 @@ class ProductCard extends StatelessWidget {
             : const Icon(Icons.image, size: 60),
         title: Text(product['name'] ?? "Ürün Adı"),
         subtitle: Text(
-          "${product['price']} ₺ / ${product['unit']}",
+          "${product['price']} ₺ / ${tr(product['unit'])}",
           style: const TextStyle(color: Colors.green),
         ),
         trailing: IconButton(

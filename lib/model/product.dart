@@ -58,4 +58,33 @@ class Product {
       'category': category,
     };
   }
+
+  // CopyWith method
+  Product copyWith({
+    String? productID,
+    String? name,
+    String? userID,
+    String? description,
+    double? price,
+    String? unit,
+    int? stock,
+    String? imageUrl,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? category,
+  }) {
+    return Product(
+      productID: productID ?? this.productID,
+      name: name ?? this.name,
+      userID: userID ?? this.userID,
+      description: description ?? this.description,
+      price: price ?? this.price,
+      unit: unit ?? this.unit,
+      stock: stock ?? this.stock,
+      imageUrl: imageUrl ?? this.imageUrl,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      category: category ?? this.category,
+    );
+  }
 }
