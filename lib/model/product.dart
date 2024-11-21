@@ -11,6 +11,7 @@ class Product {
   String? imageUrl; // Ürün resmi URL’si
   DateTime? createdAt; // Ürün eklenme tarihi
   DateTime? updatedAt; // Ürün güncellenme tarihi
+  String category;
 
   Product({
     required this.productID,
@@ -19,6 +20,7 @@ class Product {
     required this.price,
     required this.unit,
     required this.stock,
+    required this.category,
     this.description,
     this.imageUrl,
     this.createdAt,
@@ -34,9 +36,10 @@ class Product {
       price: json['price'].toDouble(),
       unit: json['unit'],
       stock: json['stock'],
+      category: json['category'],
       imageUrl: json['imageUrl'],
-      createdAt: (json['createdAt']).toDate(),
-      updatedAt: (json['updatedAt']).toDate(),
+      createdAt: (json['createdAt'] as Timestamp).toDate(),
+      updatedAt: (json['updatedAt'] as Timestamp).toDate(),
     );
   }
 
@@ -52,6 +55,7 @@ class Product {
       'imageUrl': imageUrl,
       'createdAt': createdAt ?? FieldValue.serverTimestamp(),
       'updatedAt': updatedAt ?? FieldValue.serverTimestamp(),
+      'category': category,
     };
   }
 }

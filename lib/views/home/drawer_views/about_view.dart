@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:easy_localization/easy_localization.dart'; // Import easy_localization
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutView extends StatefulWidget {
@@ -211,7 +212,7 @@ class _AboutViewState extends State<AboutView>
             children: [
               Expanded(
                 child: _buildContactItem(
-                  icon: Icons.link,
+                  icon: FontAwesomeIcons.linkedin,
                   text: 'linkedin_emin'.tr(), // Use localization
                   onTap: () =>
                       _launchUrl('https://www.linkedin.com/in/emincelebi/'),
@@ -219,7 +220,7 @@ class _AboutViewState extends State<AboutView>
               ),
               Expanded(
                 child: _buildContactItem(
-                  icon: Icons.link,
+                  icon: FontAwesomeIcons.linkedin,
                   text: 'linkedin_mustafa'.tr(), // Use localization
                   onTap: () => _launchUrl(
                       'https://www.linkedin.com/in/mustafa-kıraç-1790b31bb/'),

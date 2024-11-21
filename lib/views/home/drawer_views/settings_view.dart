@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:yesil_piyasa/core/components/enums/locales.dart';
 import 'package:yesil_piyasa/init/product_localization.dart';
 
@@ -73,7 +74,8 @@ class _SettingsViewState extends State<SettingsView> {
 
             // Dil Seçenekleri
             ListTile(
-              leading: Icon(Icons.language, color: Colors.green[800]),
+              leading:
+                  Icon(FontAwesomeIcons.earthAsia, color: Colors.green[800]),
               title: Text(tr('language_options')),
               subtitle:
                   Text('${tr('selected_language')}: ${tr('languageName')}'),
@@ -119,7 +121,8 @@ class _SettingsViewState extends State<SettingsView> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.language, size: 48, color: Colors.blue),
+                const Icon(FontAwesomeIcons.earthAsia,
+                    size: 48, color: Colors.blue),
                 const SizedBox(height: 10),
                 Text(
                   tr('select_language'),

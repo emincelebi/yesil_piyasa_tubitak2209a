@@ -211,9 +211,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                 if (true) {
                   print('Dönen değer: $result');
                   Future.delayed(Durations.medium4);
-                  setState(() {
-                    // state değişikliklerini burada uygulayın.
-                  });
+                  setState(() {});
                 }
               },
             ),
