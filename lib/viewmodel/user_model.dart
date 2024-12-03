@@ -208,4 +208,21 @@ class UserModel with ChangeNotifier implements AuthBase {
     }
     return [];
   }
+
+  Future<bool> isFavorited(String productId, String userId) async {
+    if (_user != null) {
+      return await _userRepository.isFavorited(productId, userId);
+    }
+    return false;
+  }
+
+  // Beğeni ekleme
+  Future<void> addLikeToProduct(String productId) async {
+    await _userRepository.addLikeFromProduct(productId);
+  }
+
+  // Beğeni kaldırma
+  Future<void> removeLikeFromProduct(String productId) async {
+    await _userRepository.removeLikeFromProduct(productId);
+  }
 }

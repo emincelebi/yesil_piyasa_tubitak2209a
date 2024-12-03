@@ -12,6 +12,7 @@ class Product {
   DateTime? createdAt; // Ürün eklenme tarihi
   DateTime? updatedAt; // Ürün güncellenme tarihi
   String category;
+  int likes;
 
   Product({
     required this.productID,
@@ -25,6 +26,7 @@ class Product {
     this.imageUrl,
     this.createdAt,
     this.updatedAt,
+    this.likes = 0,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -40,6 +42,7 @@ class Product {
       imageUrl: json['imageUrl'],
       createdAt: (json['createdAt'] as Timestamp).toDate(),
       updatedAt: (json['updatedAt'] as Timestamp).toDate(),
+      likes: json['likes'] ?? 0,
     );
   }
 
@@ -56,6 +59,7 @@ class Product {
       'createdAt': createdAt ?? FieldValue.serverTimestamp(),
       'updatedAt': updatedAt ?? FieldValue.serverTimestamp(),
       'category': category,
+      'likes': likes,
     };
   }
 
@@ -72,6 +76,7 @@ class Product {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? category,
+    int? likes,
   }) {
     return Product(
       productID: productID ?? this.productID,
@@ -85,6 +90,7 @@ class Product {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       category: category ?? this.category,
+      likes: likes ?? this.likes,
     );
   }
 }
