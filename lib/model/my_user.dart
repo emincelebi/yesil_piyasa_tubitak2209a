@@ -9,6 +9,7 @@ class MyUser {
   String phoneNumber; // Kullanıcının telefon numarası
   String location; // Kullanıcının bulunduğu konum (şehir/ilçe bilgisi)
   List<String>? products; // Kullanıcının sattığı ürünlerin listesi, opsiyonel
+  List<String>? myFavorites;
   String? about; // Kullanıcı hakkında kısa bilgi veya açıklama
   String? profileImageUrl; // Profil resmi URL’si
   DateTime? createdAt; // Kullanıcının oluşturulma tarihi
@@ -22,6 +23,7 @@ class MyUser {
     this.location = "",
     this.phoneNumber = "",
     this.products,
+    this.myFavorites,
     this.about,
     this.profileImageUrl,
     this.createdAt,
@@ -38,6 +40,9 @@ class MyUser {
       phoneNumber: json['phoneNumber'] ?? "",
       location: json['location'] ?? "",
       products: (json['products'] as List<dynamic>?)
+          ?.map((e) => e.toString())
+          .toList(),
+      myFavorites: (json['myFavorites'] as List<dynamic>?)
           ?.map((e) => e.toString())
           .toList(),
       about: json['about'],
@@ -57,6 +62,7 @@ class MyUser {
       'phoneNumber': phoneNumber,
       'location': location,
       'products': products ?? [],
+      'myFavorites': myFavorites ?? [],
       'about': about ?? 'Çiftçiyim',
       'profileImageUrl': profileImageUrl ??
           'https://static.vecteezy.com/system/resources/previews/020/911/740/non_2x/user-profile-icon-profile-avatar-user-icon-male-icon-face-icon-profile-icon-free-png.png',
@@ -67,6 +73,6 @@ class MyUser {
 
   @override
   String toString() {
-    return 'MyUser(userID: $userID, email: $email, name: $name, surName: $surName, phoneNumber: $phoneNumber, location: $location, products: $products, about: $about, profileImageUrl: $profileImageUrl, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'MyUser(userID: $userID, email: $email, name: $name, surName: $surName, phoneNumber: $phoneNumber, location: $location, products: $products, myFavorites: $myFavorites,about: $about, profileImageUrl: $profileImageUrl, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }

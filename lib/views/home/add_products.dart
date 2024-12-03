@@ -14,7 +14,7 @@ class AddProductsView extends StatefulWidget {
 
 class _AddProductsViewState extends State<AddProductsView> {
   bool _isFormVisible = false;
-  String _selectedCategory = '';
+  int _selectedCategoryId = -1; // Sayısal kategori ID'si
 
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _productNameController = TextEditingController();
@@ -47,7 +47,8 @@ class _AddProductsViewState extends State<AddProductsView> {
     );
   }
 
-  // Category Selector
+  // Kategori Seçici
+  // Kategori Seçici
   Widget _buildCategorySelector() {
     return Container(
       width: MediaQuery.of(context).size.width,
@@ -78,17 +79,19 @@ class _AddProductsViewState extends State<AddProductsView> {
             ),
           ),
           const SizedBox(height: 20),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
+          // Simetrik düzen için GridView kullanımı
+          GridView.count(
+            crossAxisCount: 2, // Her satırda 2 kart
+            mainAxisSpacing: 16,
+            crossAxisSpacing: 16,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(16),
             children: [
-              _buildCategoryCard(
-                  'fruit'.tr(), FontAwesomeIcons.appleWhole, Colors.red),
-              _buildCategoryCard(
-                  'vegetable'.tr(), FontAwesomeIcons.carrot, Colors.green),
-              _buildCategoryCard(
-                  'grain'.tr(), FontAwesomeIcons.wheatAwn, Colors.brown),
-              _buildCategoryCard('others'.tr(), Icons.more_horiz, Colors.blue),
+              _buildCategoryCard(0, FontAwesomeIcons.appleWhole, Colors.red),
+              _buildCategoryCard(1, FontAwesomeIcons.carrot, Colors.green),
+              _buildCategoryCard(2, FontAwesomeIcons.wheatAwn, Colors.brown),
+              _buildCategoryCard(3, Icons.more_horiz, Colors.blue),
             ],
           ),
         ],
@@ -96,12 +99,12 @@ class _AddProductsViewState extends State<AddProductsView> {
     );
   }
 
-  // Category Cards
-  Widget _buildCategoryCard(String category, IconData icon, Color color) {
+  // Kategori Kartları
+  Widget _buildCategoryCard(int categoryId, IconData icon, Color color) {
     return GestureDetector(
       onTap: () {
         setState(() {
-          _selectedCategory = category;
+          _selectedCategoryId = categoryId;
           _isFormVisible = true;
         });
       },
@@ -125,7 +128,7 @@ class _AddProductsViewState extends State<AddProductsView> {
             Icon(icon, size: 50, color: Colors.white),
             const SizedBox(height: 10),
             Text(
-              category,
+              getLocalizedCategory(categoryId),
               style: const TextStyle(
                 fontSize: 18,
                 color: Colors.white,
@@ -138,7 +141,23 @@ class _AddProductsViewState extends State<AddProductsView> {
     );
   }
 
-  // Product Form
+  // Kategori Adını Yerelleştirilmiş Hale Getirme
+  String getLocalizedCategory(int categoryId) {
+    switch (categoryId) {
+      case 0:
+        return 'fruit'.tr(); // "Meyve" Türkçede
+      case 1:
+        return 'vegetable'.tr(); // "Sebze" Türkçede
+      case 2:
+        return 'grain'.tr(); // "Tahıl" Türkçede
+      case 3:
+        return 'others'.tr(); // "Diğer" Türkçede
+      default:
+        return 'unknown'.tr();
+    }
+  }
+
+  // Ürün Formu
   Widget _buildForm(UserModel userModel) {
     return Container(
       width: double.infinity,
@@ -175,7 +194,7 @@ class _AddProductsViewState extends State<AddProductsView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '$_selectedCategory ${'product'.tr()}',
+                        '${getLocalizedCategory(_selectedCategoryId)} ${'product'.tr()}',
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -272,7 +291,8 @@ class _AddProductsViewState extends State<AddProductsView> {
                                   price: price,
                                   unit: _selectedUnit,
                                   stock: stock,
-                                  category: _selectedCategory,
+                                  category: _selectedCategoryId
+                                      .toString(), // Sayısal kategori ID'si
                                 );
 
                                 await userModel.addProduct(newProduct);
