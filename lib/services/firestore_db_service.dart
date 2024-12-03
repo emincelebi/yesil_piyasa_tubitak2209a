@@ -215,4 +215,41 @@ class FireStoreDBService implements DbBase {
       return [];
     }
   }
+
+  Future<bool> isFavorited(String productId, String userId) async {
+    try {
+      final userDoc = await _firebaseDB.collection('users').doc(userId).get();
+      if (userDoc.exists && userDoc.data() != null) {
+        final data = userDoc.data()!;
+        if (data['myFavorites'] != null &&
+            data['myFavorites'].contains(productId)) {
+          return true;
+        }
+      }
+      return false;
+    } catch (e) {
+      print("Error fetching favorite products: $e");
+      return false;
+    }
+  }
+
+  // Beğeni sayısını artırma
+  Future<void> incrementLike(String productId) async {
+    final productRef = _firebaseDB.collection('products').doc(productId);
+
+    // Firestore'da likes alanını artırma
+    await productRef.update({
+      'likes': FieldValue.increment(1),
+    });
+  }
+
+  // Beğeni sayısını azaltma
+  Future<void> decrementLike(String productId) async {
+    final productRef = _firebaseDB.collection('products').doc(productId);
+
+    // Firestore'da likes alanını azaltma
+    await productRef.update({
+      'likes': FieldValue.increment(-1),
+    });
+  }
 }

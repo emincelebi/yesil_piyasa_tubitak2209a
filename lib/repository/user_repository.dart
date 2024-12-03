@@ -169,4 +169,22 @@ class UserRepository implements AuthBase {
   Future<List<String>> fetchUserFavorites(String userID) async {
     return await _fireStoreDbService.fetchUserFavorites(userID);
   }
+
+  Future<bool> isFavorited(String productId, String userId) async {
+    return await _fireStoreDbService.isFavorited(productId, userId);
+  }
+
+  // Beğeni ekleme fonksiyonu
+  Future<void> addLikeFromProduct(String productId) async {
+    // Firestore'da ilgili ürünün beğeni sayısını güncelle
+    await _fireStoreDbService.incrementLike(productId);
+    // Burada ayrıca kullanıcı favori listesine ürün eklenebilir (isteğe bağlı)
+  }
+
+  // Beğeni kaldırma fonksiyonu
+  Future<void> removeLikeFromProduct(String productId) async {
+    // Firestore'da ilgili ürünün beğeni sayısını güncelle
+    await _fireStoreDbService.decrementLike(productId);
+    // Burada ayrıca kullanıcı favori listesinden ürün kaldırılabilir (isteğe bağlı)
+  }
 }

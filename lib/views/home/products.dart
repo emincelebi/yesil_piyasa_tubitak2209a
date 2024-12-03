@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:yesil_piyasa/core/widgets/product_detail_page.dart';
+import 'package:yesil_piyasa/model/product.dart';
 import 'package:yesil_piyasa/viewmodel/user_model.dart';
 
 class ProductsView extends StatefulWidget {
@@ -40,11 +41,14 @@ class _ProductsViewState extends State<ProductsView> {
 
     if (favoriteProductIds.contains(productId)) {
       await userModel.removeProductFromFavorites(productId);
+      await userModel.removeLikeFromProduct(productId);
+
       setState(() {
         favoriteProductIds.remove(productId); // Favorilerden çıkar
       });
     } else {
       await userModel.addProductToFavorites(productId);
+      await userModel.addLikeToProduct(productId);
       setState(() {
         favoriteProductIds.add(productId); // Favoriye ekle, listenin sonuna
       });
@@ -156,17 +160,37 @@ class _ProductsViewState extends State<ProductsView> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                // Ürüne tıklandığında ProductDetailPage'e git
+                                // Firestore'dan gelen verileri Product modeline dönüştür
+                                final product = Product(
+                                  productID: productId,
+                                  name: productData['name'] ?? "Ürün Adı",
+                                  userID:
+                                      productData['userID'] ?? "unknown_user",
+                                  price: double.tryParse(
+                                          productData['price'].toString()) ??
+                                      0.0,
+                                  unit: productData['unit'] ?? "adet",
+                                  stock: int.tryParse(
+                                          productData['stock'].toString()) ??
+                                      0,
+                                  category: productData['category'] ?? "other",
+                                  description: productData['description'] ??
+                                      "Açıklama mevcut değil.",
+                                  imageUrl: productData['imageUrl'],
+                                  createdAt:
+                                      (productData['createdAt'] as Timestamp?)
+                                          ?.toDate(),
+                                  updatedAt:
+                                      (productData['updatedAt'] as Timestamp?)
+                                          ?.toDate(),
+                                );
+
+                                // ProductDetailPage'e yönlendir ve Product nesnesini aktar
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ProductDetailPage(
-                                      product: {
-                                        ...productData,
-                                        'id': productId
-                                      },
-                                    ),
-                                  ),
+                                      builder: (context) =>
+                                          ProductDetailPage(product: product)),
                                 );
                               },
                               child: Column(
