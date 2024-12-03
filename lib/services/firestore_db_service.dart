@@ -176,4 +176,43 @@ class FireStoreDBService implements DbBase {
 
     return products;
   }
+
+  Future<void> addProductToFavorites(String userID, String productID) async {
+    await _firebaseDB.collection('users').doc(userID).update({
+      'myFavorites': FieldValue.arrayUnion([productID])
+    });
+  }
+
+  Future<void> removeProductFromFavorites(
+      String userID, String productID) async {
+    await _firebaseDB.collection('users').doc(userID).update({
+      'myFavorites': FieldValue.arrayRemove([productID])
+    });
+  }
+
+  Future<List<String>> fetchUserFavorites(String userID) async {
+    DocumentSnapshot<Map<String, dynamic>> userDoc =
+        await _firebaseDB.collection('users').doc(userID).get();
+
+    if (userDoc.exists) {
+      return List<String>.from(userDoc.data()?['myFavorites'] ?? []);
+    }
+    return [];
+  }
+
+  Future<List<String>> fetchFavoriteProducts(String userId) async {
+    try {
+      final userDoc = await _firebaseDB.collection('users').doc(userId).get();
+      if (userDoc.exists && userDoc.data() != null) {
+        final data = userDoc.data()!;
+        if (data['myFavorites'] != null && data['myFavorites'] is List) {
+          return List<String>.from(data['myFavorites']);
+        }
+      }
+      return [];
+    } catch (e) {
+      print("Error fetching favorite products: $e");
+      return [];
+    }
+  }
 }

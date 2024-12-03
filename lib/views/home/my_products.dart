@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -59,6 +61,19 @@ class _MyProductsViewState extends State<MyProductsView> {
     } catch (e) {
       showTopNotification(
           context, '${tr('error_deleting_product')}: $e', Colors.red);
+    }
+  }
+
+  String getCategoryImage(String categoryId) {
+    switch (categoryId) {
+      case '0': // Fruit
+        return 'assets/images/meyve.jpg';
+      case '1': // Vegetable
+        return 'assets/images/sebze.jpg';
+      case '2': // Grain
+        return 'assets/images/tahil.jpg';
+      default:
+        return 'assets/images/diger.jpg'; // Other categories
     }
   }
 
@@ -140,104 +155,136 @@ class _MyProductsViewState extends State<MyProductsView> {
                   itemCount: products.length,
                   itemBuilder: (context, index) {
                     final product = products[index];
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 5,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                    final categoryId = product.category;
+
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Stack(
                         children: [
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(12)),
-                              child: product.imageUrl != null
-                                  ? Image.network(
-                                      product.imageUrl!,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : Container(
-                                      color: Colors.grey[300],
-                                      child: const Icon(Icons.image,
-                                          size: 50, color: Colors.grey),
+                          // Arka plan bulanıklaştırma
+                          BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.white.withOpacity(0.2),
+                                    Colors.white.withOpacity(0.1),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.2),
+                                  width: 1.5,
+                                ),
+                              ),
+                            ),
+                          ),
+                          // İçerik
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(12)),
+                                  child: product.imageUrl != null
+                                      ? Image.network(
+                                          product.imageUrl!,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Image.asset(
+                                          getCategoryImage(categoryId),
+                                          fit: BoxFit.cover,
+                                        ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      product.name,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  product.name,
-                                  style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '${tr('price')}: ${product.price} ${tr(product.unit)}',
-                                  style: const TextStyle(
-                                      fontSize: 14, color: Colors.grey),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.blue,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${tr('price')}: ${product.price} ${tr(product.unit)}',
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.black54,
                                       ),
-                                      onPressed: () {
-                                        // Düzenleme ekranına geçiş
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                EditProductView(
-                                                    product: product),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.blue,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
                                           ),
-                                        );
-                                      },
-                                      child: const Icon(
-                                        FontAwesomeIcons.penToSquare,
-                                        color: Colors.white,
-                                      )),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.red,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
+                                        ),
+                                        onPressed: () {
+                                          // Edit screen transition
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  EditProductView(
+                                                      product: product),
+                                            ),
+                                          );
+                                        },
+                                        child: const Icon(
+                                          FontAwesomeIcons.penToSquare,
+                                          color: Colors.white,
                                         ),
                                       ),
-                                      onPressed: () {
-                                        deleteProduct(product);
-                                      },
-                                      child: const Icon(
-                                        FontAwesomeIcons.trashCan,
-                                        color: Colors.white,
-                                      )),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.red,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          deleteProduct(product);
+                                        },
+                                        child: const Icon(
+                                          FontAwesomeIcons.trashCan,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(height: 8),
+                            ],
                           ),
-                          const SizedBox(height: 8),
                         ],
                       ),
                     );

@@ -186,4 +186,26 @@ class UserModel with ChangeNotifier implements AuthBase {
     notifyListeners();
     return products;
   }
+
+  Future<void> addProductToFavorites(String productID) async {
+    if (_user != null) {
+      await _userRepository.addProductToFavorites(_user!.userID, productID);
+      notifyListeners();
+    }
+  }
+
+  Future<void> removeProductFromFavorites(String productID) async {
+    if (_user != null) {
+      await _userRepository.removeProductFromFavorites(
+          _user!.userID, productID);
+      notifyListeners();
+    }
+  }
+
+  Future<List<String>> fetchUserFavorites() async {
+    if (_user != null) {
+      return await _userRepository.fetchUserFavorites(_user!.userID);
+    }
+    return [];
+  }
 }

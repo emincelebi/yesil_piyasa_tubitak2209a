@@ -156,4 +156,17 @@ class UserRepository implements AuthBase {
       return [];
     }
   }
+
+  Future<void> addProductToFavorites(String userID, String productID) async {
+    await _fireStoreDbService.addProductToFavorites(userID, productID);
+  }
+
+  Future<void> removeProductFromFavorites(
+      String userID, String productID) async {
+    await _fireStoreDbService.removeProductFromFavorites(userID, productID);
+  }
+
+  Future<List<String>> fetchUserFavorites(String userID) async {
+    return await _fireStoreDbService.fetchUserFavorites(userID);
+  }
 }
