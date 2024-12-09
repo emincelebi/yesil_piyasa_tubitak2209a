@@ -187,4 +187,8 @@ class UserRepository implements AuthBase {
     await _fireStoreDbService.decrementLike(productId);
     // Burada ayrıca kullanıcı favori listesinden ürün kaldırılabilir (isteğe bağlı)
   }
+
+  Future<MyUser> fetchUser(String userId) async {
+    return await _fireStoreDbService.fetchUser(userId);
+  }
 }

@@ -5,9 +5,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:yesil_piyasa/core/widgets/product_detail_page.dart';
 import 'package:yesil_piyasa/model/product.dart';
 import 'package:yesil_piyasa/viewmodel/user_model.dart';
+import 'package:yesil_piyasa/views/product_detail_page.dart';
 
 class ProductsView extends StatefulWidget {
   const ProductsView({super.key});
@@ -41,14 +41,12 @@ class _ProductsViewState extends State<ProductsView> {
 
     if (favoriteProductIds.contains(productId)) {
       await userModel.removeProductFromFavorites(productId);
-      await userModel.removeLikeFromProduct(productId);
 
       setState(() {
         favoriteProductIds.remove(productId); // Favorilerden çıkar
       });
     } else {
       await userModel.addProductToFavorites(productId);
-      await userModel.addLikeToProduct(productId);
       setState(() {
         favoriteProductIds.add(productId); // Favoriye ekle, listenin sonuna
       });
@@ -94,6 +92,7 @@ class _ProductsViewState extends State<ProductsView> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          Text('home'.tr()),
                           const Icon(
                             FontAwesomeIcons.shop,
                             size: 40,
