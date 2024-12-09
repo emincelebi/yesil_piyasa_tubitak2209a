@@ -6,7 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ReportView extends StatefulWidget {
-  const ReportView({super.key});
+  const ReportView({super.key, this.phoneNumber});
+  final String? phoneNumber;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -37,6 +38,9 @@ class _ReportViewState extends State<ReportView>
     _rotationAnimation = Tween<double>(begin: 0, end: 2 * pi).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.linear),
     );
+    if (widget.phoneNumber != null) {
+      _telefonController.text = widget.phoneNumber!;
+    }
   }
 
   @override

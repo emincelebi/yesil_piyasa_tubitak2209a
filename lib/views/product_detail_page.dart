@@ -5,6 +5,7 @@ import 'package:yesil_piyasa/core/components/launch.dart';
 import 'package:yesil_piyasa/model/my_user.dart';
 import 'package:yesil_piyasa/model/product.dart';
 import 'package:yesil_piyasa/viewmodel/user_model.dart';
+import 'package:yesil_piyasa/views/home/drawer_views/report_view.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final Product product;
@@ -103,30 +104,33 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     return DateFormat('d MMMM y', context.locale.toString()).format(date);
   }
 
-  void _showContactDialog(BuildContext context) {
-    showDialog(
+  void _showContactBottomSheet(BuildContext context) {
+    showModalBottomSheet(
       context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          title: Row(
-            children: [
-              const Icon(Icons.contact_page,
-                  color: Colors.blueAccent, size: 28),
-              const SizedBox(width: 10),
-              Text(
-                "contact_info".tr(),
-                style:
-                    const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          content: Column(
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Başlık
+              Row(
+                children: [
+                  const Icon(Icons.contact_page,
+                      color: Colors.blueAccent, size: 28),
+                  const SizedBox(width: 10),
+                  Text(
+                    "contact_info".tr(),
+                    style: const TextStyle(
+                        fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
               // Kullanıcı Adı ve Soyadı
               Row(
                 children: [
@@ -201,17 +205,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                "close".tr(),
-                style: const TextStyle(fontSize: 18),
-              ),
-            ),
-          ],
         );
       },
     );
@@ -220,6 +213,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           Positioned.fill(
@@ -269,47 +263,132 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             ),
           ),
           Positioned(
+            top: 40, // Ekranın üstünden boşluk
+            right: 16, // Sol taraftan boşluk
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => ReportView(
+                  phoneNumber: ownerProduct!.phoneNumber,
+                ),
+              )),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.red, // Arka plan rengi
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.report,
+                  color: Colors.black,
+                  size: 28,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
             top: 300,
             bottom: 0,
             left: 0,
             right: 0,
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
-                ),
-              ),
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Ürün Başlığı
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 16.0, horizontal: 12.0),
-                    color: Colors.orange.shade50,
-                    child: Text(
-                      widget.product.name,
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+            child: SingleChildScrollView(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
                   ),
-                  const SizedBox(height: 16),
-                  // Fiyat ve Kategori Etiketli
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
+                ),
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Ürün Başlığı
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16.0, horizontal: 12.0),
+                      color: Colors.orange.shade50,
+                      child: Text(
+                        widget.product.name,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Fiyat ve Kategori Etiketli
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "${"price".tr()}:",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black54,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              "${widget.product.price.toStringAsFixed(2)} ₺ / ${tr(widget.product.unit)}",
+                              style: const TextStyle(
+                                fontSize: 22,
+                                color: Colors.green,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              "${"category".tr()}:",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black54,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade100,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                getCategoryNames(widget.product.category),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    // Açıklama Etiketli
+                    if (widget.product.description != null)
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "${"price".tr()}:",
+                            "${"description".tr()}:",
                             style: const TextStyle(
                               fontSize: 16,
                               color: Colors.black54,
@@ -317,152 +396,99 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             ),
                           ),
                           Text(
-                            "${widget.product.price.toStringAsFixed(2)} ₺ / ${widget.product.unit}",
+                            widget.product.description!,
                             style: const TextStyle(
-                              fontSize: 22,
-                              color: Colors.green,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 18,
+                              color: Colors.black87,
+                              height: 1.5,
                             ),
                           ),
+                          const SizedBox(height: 16),
                         ],
                       ),
+                    // Stok Bilgisi Etiketli
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${"stock_info".tr()}:",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.black54,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          "${"stock".tr()}: ${widget.product.stock}",
+                          style: const TextStyle(
+                              fontSize: 18, color: Colors.black54),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    // Tarih Bilgisi Etiketli
+                    if (widget.product.createdAt != null ||
+                        widget.product.updatedAt != null)
                       Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "${"category".tr()}:",
+                            "${"date_info".tr()}:",
                             style: const TextStyle(
                               fontSize: 16,
                               color: Colors.black54,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.blue.shade100,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              getCategoryNames(widget.product.category),
+                          if (widget.product.createdAt != null)
+                            Text(
+                              "${"add_date".tr()}: ${formatDate(widget.product.createdAt!)}",
                               style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
+                                  fontSize: 16, color: Colors.black45),
                             ),
-                          ),
+                          if (widget.product.updatedAt != null)
+                            Text(
+                              "${"last_update".tr()}: ${formatDate(widget.product.updatedAt!)}",
+                              style: const TextStyle(
+                                  fontSize: 16, color: Colors.black45),
+                            ),
                         ],
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  // Açıklama Etiketli
-                  if (widget.product.description != null)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    const SizedBox(height: 40),
+                    // İletişim ve Favori
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          "${"description".tr()}:",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.black54,
-                            fontWeight: FontWeight.bold,
+                        ElevatedButton.icon(
+                          onPressed: () => _showContactBottomSheet(context),
+                          icon: const Icon(
+                            Icons.phone,
+                            color: Colors.white,
+                          ),
+                          label: Text("contact".tr()),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 12),
+                            textStyle: const TextStyle(fontSize: 18),
                           ),
                         ),
-                        Text(
-                          widget.product.description!,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: Colors.black87,
-                            height: 1.5,
+                        IconButton(
+                          onPressed: isProcessing
+                              ? null
+                              : () {
+                                  toggleFavorite(widget.product.productID);
+                                },
+                          icon: Icon(
+                            isFavorite ? Icons.favorite : Icons.favorite_border,
+                            color: isFavorite ? Colors.red : Colors.grey,
+                            size: 32,
                           ),
                         ),
-                        const SizedBox(height: 16),
                       ],
                     ),
-                  // Stok Bilgisi Etiketli
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "${"stock_info".tr()}:",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.black54,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "${"stock".tr()}: ${widget.product.stock}",
-                        style: const TextStyle(
-                            fontSize: 18, color: Colors.black54),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  // Tarih Bilgisi Etiketli
-                  if (widget.product.createdAt != null ||
-                      widget.product.updatedAt != null)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "${"date_info".tr()}:",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.black54,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        if (widget.product.createdAt != null)
-                          Text(
-                            "${"add_date".tr()}: ${formatDate(widget.product.createdAt!)}",
-                            style: const TextStyle(
-                                fontSize: 16, color: Colors.black45),
-                          ),
-                        if (widget.product.updatedAt != null)
-                          Text(
-                            "${"last_update".tr()}: ${formatDate(widget.product.updatedAt!)}",
-                            style: const TextStyle(
-                                fontSize: 16, color: Colors.black45),
-                          ),
-                      ],
-                    ),
-                  const SizedBox(height: 40),
-                  // İletişim ve Favori
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: () => _showContactDialog(context),
-                        icon: const Icon(
-                          Icons.phone,
-                          color: Colors.white,
-                        ),
-                        label: Text("contact".tr()),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueAccent,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 12),
-                          textStyle: const TextStyle(fontSize: 18),
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: isProcessing
-                            ? null
-                            : () {
-                                toggleFavorite(widget.product.productID);
-                              },
-                        icon: Icon(
-                          isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: isFavorite ? Colors.red : Colors.grey,
-                          size: 32,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

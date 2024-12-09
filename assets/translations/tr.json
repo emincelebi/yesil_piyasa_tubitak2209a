@@ -10,6 +10,7 @@
     "logout": "Çıkış Yap",
     "close": "Kapat",
     "send": "Gönder",
+    "choose_city": "Bir İl Seçin",
     "price": "Fiyat",
     "date_info": "Tarih Bilgileri",
     "add_date": "Eklenme Tarihi",
@@ -127,5 +128,12 @@
     "faq_question_5": "Müşteri hizmetlerine her zaman ulaşabilir miyim?",
     "faq_answer_5": "Evet, müşteri hizmetlerimiz her gün ulaşılabilir. 'İletişim' seçeneğinden bize ulaşabilirsiniz.",
     "faq_question_6": "Uygulamadaki verilerimi değiştirebilir miyim?",
-    "faq_answer_6": "Evet, uygulamanın ayarları kısmından verilerinizi her zaman güncelleyebilirsiniz."
+    "faq_answer_6": "Evet, uygulamanın ayarları kısmından verilerinizi her zaman güncelleyebilirsiniz.",
+    "send_otp": "Kod Gönder",
+    "enter_otp": "Kod Girin",
+    "enter_new_password": "Yeni şifrenizi girin",
+    "reset_password": "Şifreyi Sıfırla",
+    "phone_length_error": "Telefon numarası 10 veya 11 haneli olmalıdır",
+    "verification_failed": "Doğrulama başarısız oldu",
+    "password_reset_success": "Şifre başarıyla sıfırlandı"
 }

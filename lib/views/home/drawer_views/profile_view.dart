@@ -310,7 +310,7 @@ class _ProfileViewState extends State<ProfileView> {
       ),
       leading: Icon(icon, color: Colors.green),
       trailing: IconButton(
-        onPressed: field == 'email'
+        onPressed: (field == 'email' || field == 'location')
             ? null
             : () {
                 _showEditDialog(

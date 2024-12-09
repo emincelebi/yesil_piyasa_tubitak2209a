@@ -10,12 +10,12 @@ import 'package:yesil_piyasa/viewmodel/user_model.dart';
 import 'package:yesil_piyasa/views/home/add_products.dart';
 import 'package:yesil_piyasa/views/home/drawer_views/about_view.dart';
 import 'package:yesil_piyasa/views/home/drawer_views/favorites_view.dart';
+import 'package:yesil_piyasa/views/home/drawer_views/profile_view.dart';
 import 'package:yesil_piyasa/views/home/drawer_views/report_view.dart';
 import 'package:yesil_piyasa/views/home/drawer_views/settings_view.dart';
 import 'package:yesil_piyasa/views/home/drawer_views/truck_drivers_view.dart';
 import 'package:yesil_piyasa/views/home/my_products.dart';
 import 'package:yesil_piyasa/views/home/products.dart';
-import 'package:yesil_piyasa/views/home/profile_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({

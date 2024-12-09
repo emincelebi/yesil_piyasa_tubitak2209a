@@ -10,6 +10,7 @@
     "logout": "Abmelden",
     "close": "schließen",
     "send": "Senden",
+    "choose_city": "Wählen Sie eine Provinz aus",
     "price": "Preis",
     "date_info": "Datumsangaben",
     "add_date": "Datum hinzugefügt",
@@ -127,5 +128,12 @@
     "faq_question_5": "Kann ich den Kundendienst jederzeit erreichen?",
     "faq_answer_5": "Ja, unser Kundendienst ist täglich erreichbar. Sie können uns über die 'Kontakt' Option erreichen.",
     "faq_question_6": "Kann ich meine Daten in der App ändern?",
-    "faq_answer_6": "Ja, Sie können Ihre Daten in den Einstellungen der App jederzeit aktualisieren."
+    "faq_answer_6": "Ja, Sie können Ihre Daten in den Einstellungen der App jederzeit aktualisieren.",
+    "send_otp": "Code senden",
+    "enter_otp": "Geben Sie den Code ein",
+    "enter_new_password": "Geben Sie Ihr neues Passwort ein",
+    "reset_password": "Passwort zurücksetzen",
+    "phone_length_error": "Die Telefonnummer muss 10 oder 11 Stellen haben",
+    "verification_failed": "Verifizierung fehlgeschlagen",
+    "password_reset_success": "Passwort erfolgreich zurückgesetzt"
 }
