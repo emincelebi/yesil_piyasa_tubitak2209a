@@ -14,6 +14,14 @@ class UserModel with ChangeNotifier implements AuthBase {
   ViewState _state = ViewState.Idle;
   final UserRepository _userRepository = locator<UserRepository>();
   MyUser? _user;
+  String _verificationId = "";
+
+  String get verificationId => _verificationId;
+
+  set verificationId(String id) {
+    _verificationId = id;
+    notifyListeners();
+  }
 
   MyUser? get user => _user;
 

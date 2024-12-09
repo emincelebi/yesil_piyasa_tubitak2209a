@@ -10,6 +10,7 @@
     "logout": "Log Out",
     "close": "Close",
     "send": "Send",
+    "choose_city": "Choose a city",
     "edit_product": "Edit Product",
     "date_info": "Date Info",
     "add_date": "Add Date",
@@ -127,5 +128,12 @@
     "faq_question_5": "Can I contact customer service at any time?",
     "faq_answer_5": "Yes, our customer service is available every day. You can reach us via the 'Contact' option.",
     "faq_question_6": "Can I change my data in the app?",
-    "faq_answer_6": "Yes, you can update your data anytime in the app settings."
+    "faq_answer_6": "Yes, you can update your data anytime in the app settings.",
+    "send_otp": "Send OTP",
+    "enter_otp": "Enter OTP",
+    "enter_new_password": "Enter your new password",
+    "reset_password": "Reset Password",
+    "phone_length_error": "Phone number must be 10 or 11 digits",
+    "verification_failed": "Verification failed",
+    "password_reset_success": "Password has been reset successfully"
 }

@@ -8,8 +8,10 @@ import 'package:yesil_piyasa/core/widgets/error_display.dart';
 import 'package:yesil_piyasa/core/widgets/welcome_button.dart';
 import 'package:yesil_piyasa/core/widgets/welcome_textfield.dart';
 import 'package:yesil_piyasa/main.dart';
+import 'package:yesil_piyasa/model/cities.dart';
 import 'package:yesil_piyasa/model/my_user.dart';
 import 'package:yesil_piyasa/viewmodel/user_model.dart';
+import 'package:yesil_piyasa/views/auth/forgot_password_view.dart';
 
 enum LoginState { initialize, login, signup }
 
@@ -25,13 +27,17 @@ class _WelcomeViewState extends State<WelcomeView>
   late TabController _tabController;
   final _formKeyLogin = GlobalKey<FormState>();
   final _formKeySignup = GlobalKey<FormState>();
-
+  String? selectedIl; // Seçilen il bilgisi
+  String? selectedIlName;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController surNameController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
+  String? selectedCity;
+  String? selectedDistrict;
+  List<String> districts = [];
 
   @override
   void initState() {
@@ -210,7 +216,11 @@ class _WelcomeViewState extends State<WelcomeView>
             const SizedBox(height: 10),
             TextButton(
               onPressed: () {
-                // Handle forgotten password logic here
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ForgotPasswordView()),
+                );
               },
               child: Text(
                 "forgot_password"
@@ -225,6 +235,10 @@ class _WelcomeViewState extends State<WelcomeView>
   }
 
   Widget showSignup() {
+    Cities cities = Cities();
+    final List<Map<String, String>> turkeyCities =
+        cities.convertToDropdownData(); // Türkiye illeri verisi
+
     return SingleChildScrollView(
       child: Form(
         key: _formKeySignup,
@@ -234,34 +248,31 @@ class _WelcomeViewState extends State<WelcomeView>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               WelcomeTextField(
-                hintText: "enter_name".tr(), // Use localization for hint text
+                hintText: "enter_name".tr(),
                 icon: Icons.person,
                 controller: nameController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'name_error'
-                        .tr(); // Use localization for validation error
+                    return 'name_error'.tr();
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 10),
               WelcomeTextField(
-                hintText:
-                    "enter_surname".tr(), // Use localization for hint text
+                hintText: "enter_surname".tr(),
                 icon: Icons.person_outline,
                 controller: surNameController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'surname_error'
-                        .tr(); // Use localization for validation error
+                    return 'surname_error'.tr();
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 10),
               WelcomeTextField(
-                hintText: "enter_email".tr(), // Use localization for hint text
+                hintText: "enter_email".tr(),
                 icon: Icons.email,
                 keyboardType: TextInputType.emailAddress,
                 controller: _emailController,
@@ -269,66 +280,110 @@ class _WelcomeViewState extends State<WelcomeView>
               ),
               const SizedBox(height: 10),
               WelcomeTextField(
-                hintText:
-                    "enter_password".tr(), // Use localization for hint text
+                hintText: "enter_password".tr(),
                 icon: Icons.lock,
                 obscureText: true,
                 controller: _passwordController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'password_error'
-                        .tr(); // Use localization for validation error
+                    return 'password_error'.tr();
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 10),
-              WelcomeTextField(
-                hintText:
-                    "enter_location".tr(), // Use localization for hint text
-                icon: Icons.location_on,
-                controller: locationController,
+              // İl Dropdown
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide: const BorderSide(color: Colors.grey),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide: const BorderSide(color: Colors.blue),
+                  ),
+                  hintText: "choose_city".tr(),
+                  hintStyle: TextStyle(color: Colors.grey[600]),
+                ),
+                dropdownColor: Colors.white,
+                value: selectedIl,
+                isExpanded: true,
+                items: turkeyCities.map((data) {
+                  return DropdownMenuItem<String>(
+                    value: data['id'].toString(), // İl ID'sini kullanıyoruz
+                    child: Text(data['name']!,
+                        style: const TextStyle(fontSize: 16)),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedIl = value; // Seçilen il ID'sini kaydet
+                    if (value != null && value.isNotEmpty) {
+                      selectedIlName = turkeyCities.firstWhere(
+                        (city) => city['id'].toString() == value,
+                        orElse: () => {
+                          'id': '',
+                          'name': ''
+                        }, // Boş dönen değer burada kontrol ediliyor
+                      )['name'];
+                    } else {
+                      selectedIlName =
+                          null; // Eğer il seçilmediyse, name'i null yap
+                    }
+                  });
+                  print("$selectedIl $selectedIlName $value");
+                },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'location_error'
-                        .tr(); // Use localization for validation error
+                    return 'choose_city'.tr(); // Hata mesajı
                   }
                   return null;
                 },
+                icon: const Icon(Icons.arrow_drop_down, size: 30),
+                style: const TextStyle(fontSize: 16, color: Colors.black),
+                menuMaxHeight: 250,
               ),
               const SizedBox(height: 10),
               WelcomeTextField(
-                hintText: "enter_phone".tr(), // Use localization for hint text
+                hintText: "enter_phone".tr(),
                 icon: Icons.phone,
                 keyboardType: TextInputType.phone,
                 controller: phoneController,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(11),
+                ],
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'phone_error'
-                        .tr(); // Use localization for validation error
+                    return 'phone_error'.tr();
                   }
                   if (value.length != 10 && value.length != 11) {
-                    return 'phone_length_error'.tr(); // Localization for error
+                    return 'phone_length_error'.tr();
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 20),
               WelcomeButton(
-                text: "register".tr(), // Use localization for button text
+                text: "register".tr(),
                 onPressed: () {
                   if (_formKeySignup.currentState?.validate() ?? false) {
                     signUpEmailAndPassword(
                       _emailController.text,
                       _passwordController.text,
                       MyUser(
-                          userID: "1",
-                          email: _emailController.text,
-                          name: nameController.text,
-                          surName: surNameController.text,
-                          location: locationController.text,
-                          phoneNumber: phoneController.text),
+                        userID: "1",
+                        email: _emailController.text,
+                        name: nameController.text,
+                        surName: surNameController.text,
+                        location: selectedIlName ?? "", // Seçilen ili kullan
+                        phoneNumber: phoneController.text,
+                      ),
                     );
                   }
                 },
