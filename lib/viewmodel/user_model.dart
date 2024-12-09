@@ -119,6 +119,13 @@ class UserModel with ChangeNotifier implements AuthBase {
     return downloadLink;
   }
 
+  Future<MyUser> fetchUser(String userId) async {
+    _state = ViewState.Busy;
+    MyUser returnUser = await _userRepository.fetchUser(userId);
+    _state = ViewState.Idle;
+    return returnUser;
+  }
+
   Future<void> addProduct(Product product) async {
     _state = ViewState.Busy;
     notifyListeners();
@@ -188,41 +195,51 @@ class UserModel with ChangeNotifier implements AuthBase {
   }
 
   Future<void> addProductToFavorites(String productID) async {
+    _state = ViewState.Busy;
+
     if (_user != null) {
       await _userRepository.addProductToFavorites(_user!.userID, productID);
       notifyListeners();
     }
+    _state = ViewState.Idle;
   }
 
   Future<void> removeProductFromFavorites(String productID) async {
-    if (_user != null) {
-      await _userRepository.removeProductFromFavorites(
-          _user!.userID, productID);
-      notifyListeners();
+    try {
+      _state = ViewState.Busy;
+      if (_user != null) {
+        await _userRepository.removeProductFromFavorites(
+            _user!.userID, productID);
+        notifyListeners();
+      }
+    } finally {
+      _state = ViewState.Idle;
     }
   }
 
   Future<List<String>> fetchUserFavorites() async {
-    if (_user != null) {
-      return await _userRepository.fetchUserFavorites(_user!.userID);
+    _state = ViewState.Busy;
+    try {
+      if (_user != null) {
+        return await _userRepository.fetchUserFavorites(_user!.userID);
+      }
+    } finally {
+      _state = ViewState.Idle;
     }
+
     return [];
   }
 
   Future<bool> isFavorited(String productId, String userId) async {
-    if (_user != null) {
-      return await _userRepository.isFavorited(productId, userId);
+    try {
+      _state = ViewState.Busy;
+      if (_user != null) {
+        return await _userRepository.isFavorited(productId, userId);
+      }
+    } finally {
+      _state = ViewState.Idle;
     }
+
     return false;
-  }
-
-  // Beğeni ekleme
-  Future<void> addLikeToProduct(String productId) async {
-    await _userRepository.addLikeFromProduct(productId);
-  }
-
-  // Beğeni kaldırma
-  Future<void> removeLikeFromProduct(String productId) async {
-    await _userRepository.removeLikeFromProduct(productId);
   }
 }

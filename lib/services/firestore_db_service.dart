@@ -252,4 +252,12 @@ class FireStoreDBService implements DbBase {
       'likes': FieldValue.increment(-1),
     });
   }
+
+  Future<MyUser> fetchUser(String userId) async {
+    final fetchedUser = await _firebaseDB.collection('users').doc(userId).get();
+    Map<String, dynamic> userInfo = fetchedUser.data() ?? {};
+    MyUser userObject = MyUser.fromJson(userInfo);
+
+    return userObject;
+  }
 }
